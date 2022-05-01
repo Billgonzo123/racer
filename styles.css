@@ -5,7 +5,7 @@
     top: 50%;
     left: 50%;
     /* compensate for (0,0) being top left by shifting up and left 50% of elements dimentions */
-    transform: translate(-50%, -50%) scale(2);
+    transform: translate(-50%, -50%) scale(5);
     border: 2px solid black;
 
 }

@@ -1,5 +1,6 @@
 
-
+let keysPressed = [];
+let carDistance = 0;
 function draw() {
     const canvas = document.getElementById('game-window');
     if (canvas.getContext) {
@@ -8,7 +9,7 @@ function draw() {
         const h = 100;
         setInterval(() => {
             loop(ctx, w, h)
-        }, 200)
+        }, 16.667)
 
 
     }
@@ -17,11 +18,15 @@ function draw() {
 draw();
 
 function loop(ctx, w, h) {
+    if (keysPressed.includes('w')) carDistance += 50;
 
     //draw road
-    for (y = 0; y < h/2 ; y++) {
+    for (y = 0; y < h / 2; y++) {
         for (let x = 0; x < w; x++) {
-            const perspective = y/(h/2);
+            const perspective = y / (h / 2);
+            // grass color
+            const grassColor = (Math.sin(20 * Math.pow(1 - perspective, 3) + carDistance * .01) > 0) ? 'green' : 'darkgreen';
+            const clipColor = (Math.sin(20 * Math.pow(1 - perspective, 2) + carDistance * .01) > 0) ? 'red' : 'white';
             let color = 'red';
             const midPoint = 0.5;
             let roadWidth = 0.1 + perspective * 0.8;
@@ -31,12 +36,12 @@ function loop(ctx, w, h) {
             const leftClip = (midPoint - roadWidth) * w;
             const rightGrass = (midPoint + roadWidth + clipWidth) * w;
             const rightClip = (midPoint + roadWidth) * w;
-            if (x >= 0 && x < leftGrass) color = 'green';
-            if (x >= leftGrass && x < leftClip) color = 'red';
+            if (x >= 0 && x < leftGrass) color = grassColor;
+            if (x >= leftGrass && x < leftClip) color = clipColor;
             if (x >= leftClip && x < rightClip) color = 'grey';
-            if (x >= rightClip && x < rightGrass) color = 'red';
-            if (x >= rightGrass && x < w) color = 'green';
-            const row = (h/2) + y;
+            if (x >= rightClip && x < rightGrass) color = clipColor;
+            if (x >= rightGrass && x < w) color = grassColor;
+            const row = (h / 2) + y;
             ctx.fillStyle = color;
             ctx.fillRect(x, row, 1, 1);
         }
@@ -44,7 +49,22 @@ function loop(ctx, w, h) {
 
     //draw car
     const carX = (w / 2) - 4;
-    const carY = h-20;
+    const carY = h - 20;
     ctx.fillStyle = 'blue';
     ctx.fillRect(carX, carY, 8, 10);
 }
+
+/////////////Key inputs///////////////////
+const logKeyDown = (e) => {
+    if (!keysPressed.includes(e.key)) keysPressed = [...keysPressed, e.key.toLowerCase()];
+    console.log(keysPressed)
+};
+
+const logKeyUp = (e) => {
+    const newKeys = keysPressed.filter((key) => key !== e.key.toLowerCase());
+    if (newKeys !== keysPressed) keysPressed = newKeys;
+    console.log(keysPressed)
+};
+
+document.addEventListener("keyup", logKeyUp);
+document.addEventListener("keydown", logKeyDown);

@@ -7,52 +7,74 @@ let trackCurve = 0;
 let playerCurve = 0;
 let lap = 1;
 
+let ctx = 0;
+let w = 0;
+let h = 0;
+
+var lastCalledTime;
+var fps;
 // set track sections [curvatrue, dist]
 const trackArray = [
-    [0, 100],
+    [0, 5000],
     [0, 20000],
     [1, 20000],
     [0, 20000],
     [-1, 20000],
-    [-0.5, 20000],
     [0.5, 20000],
+    [1.5, 20000],
     [0, 50000],
 ];
-function draw() {
+//get total length of track
+let trackLength = 0;
+for (let i = 0; i < trackArray.length; i++) {
+    trackLength += trackArray[i][1];
+}
+
+
+
+function run() {
     const canvas = document.getElementById('game-window');
     if (canvas.getContext) {
-        let ctx = canvas.getContext('2d');
-        const w = 160;
-        const h = 100;
-        loop(ctx, w, h)
-        setTimeout(() => {
-            draw();
-        }, 16.667)
-
-
+        ctx = canvas.getContext('2d', { alpha: false });
+         w = canvas.width;
+         h = canvas.height;
+      window.requestAnimationFrame(loop)
     }
 }
 
-draw();
 
-function loop(ctx, w, h) {
+
+function loop() {
+
+
+    if(!lastCalledTime) {
+        lastCalledTime = Date.now();
+        fps = 0;
+     }
+     delta = (Date.now() - lastCalledTime)/1000;
+     lastCalledTime = Date.now();
+     fps = 1/delta;
+
+
+
+
     if (keysPressed.includes('w')) {
         speed += 0.25;
     } else {
-      speed -= 0.17 ;
+        speed -= 0.17;
     }
     if (keysPressed.includes('s')) {
         speed -= 1;
     }
-    if(keysPressed.includes('a') && speed > 0) playerCurve -= (.015);
-    if(keysPressed.includes('d') && speed > 0) playerCurve += (.015);
+    if (keysPressed.includes('a') && speed > 0) playerCurve -= (.015);
+    if (keysPressed.includes('d') && speed > 0) playerCurve += (.015);
 
     //if you are outside the track, force slow down
-    if (Math.abs(playerCurve-trackCurve) >= 0.75) speed -= 1;
+    if (Math.abs(playerCurve - trackCurve) >= 0.75) speed -= 1;
 
     //set speed limits
-    if (speed<0) speed=0;
-    if (speed>140) speed=140;
+    if (speed < 0) speed = 0;
+    if (speed > 140) speed = 140;
     //keep track of how far car has traveled
     carDistance += speed;
     //keep track of where we are on the track
@@ -70,29 +92,45 @@ function loop(ctx, w, h) {
     }
     //find the target track curve after finding trackSection index
     const targetCurve = trackArray[trackSection - 1][0];
-    const curveDiff = (targetCurve - currentCurve) * (speed/14000);
+    const curveDiff = (targetCurve - currentCurve) * (speed / 14000);
     currentCurve += curveDiff;
 
     //change this float to adjust how hard the car is pushed in the opposite direction of the curve
-    trackCurve += currentCurve * (.00022*(speed));
-    
+    trackCurve += currentCurve * (.00022 * (speed));
 
-    // console.log('Lap: ', lap);
-    // console.log('Curve: ', trackCurve);
-    // console.log('Section: ', trackSection-1);
-    // console.log('Speed: ', speed);
-    // console.log('Distance: ', carDistance/140000);
-    // console.log('OffSet: ', offSet/140000);
-  
-    //draw track
+
+
+    //draw sky
     for (y = 0; y < h / 2; y++) {
         for (let x = 0; x < w; x++) {
-            const perspective = y / (h / 2);
+            ctx.fillRect( Math.floor(x),  Math.floor(y), 1, 1);
+
+        }
+    }
+    //draw hills
+    for (x = 0; x < w; x++) {
+        const hillHeight = Math.abs(Math.sin(x * 0.01 + trackCurve) * 16.0);
+
+        for (let y = (h/2)-hillHeight; y < h/2; y++) {
+            
+            ctx.fillStyle = 'green';
+            ctx.fillRect( Math.floor(x),  Math.floor(y), 1, 1);
+
+        }
+    }
+    //draw track
+    for (y = 0; y < h / 2; y++) {
+        const perspective = y / (h / 2);
+        for (let x = 0; x < w; x++) {
             // grass color
-            const grassColor = (Math.sin(20 * Math.pow(1 - perspective, 3) + carDistance * .01) > 0) ? 'green' : 'darkgreen';
+            const grassColor = (Math.sin(20 * Math.pow(1 - perspective, 3) + carDistance * .008) > 0) ? 'green' : 'darkgreen';
             const clipColor = (Math.sin(40 * Math.pow(1 - perspective, 2) + carDistance * .02) > 0) ? 'red' : 'white';
+
+            const startLine = Math.pow(1 - perspective, 2) + ((trackLength - carDistance) * .02);
+
+
             let color = 'red';
-            const midPoint = 0.5+currentCurve * Math.pow(1 - perspective, 3);
+            const midPoint = 0.5 + currentCurve * Math.pow(1 - perspective, 3);
             let roadWidth = 0.1 + perspective * 0.8;
             const clipWidth = roadWidth * 0.15;
             //get half of road width. makes calculations easier for symetrical track
@@ -103,22 +141,29 @@ function loop(ctx, w, h) {
             const rightClip = (midPoint + roadWidth) * w;
             if (x >= 0 && x < leftGrass) color = grassColor;
             if (x >= leftGrass && x < leftClip) color = clipColor;
-            if (x >= leftClip && x < rightClip) color = (carDistance<1000 && y<10+carDistance*.07 && y>0+carDistance*.07 ) ? 'white':'grey';
+            if (x >= leftClip && x < rightClip) color = (y < 50 - startLine + (10 * perspective) && y > 50 - startLine) ? 'white' : 'grey';
             if (x >= rightClip && x < rightGrass) color = clipColor;
             if (x >= rightGrass && x < w) color = grassColor;
             const row = (h / 2) + y;
             ctx.fillStyle = color;
-            ctx.fillRect(x, row, 1, 1);
+            ctx.fillRect( Math.floor(x),  Math.floor(row), 1, 1);
+
         }
     }
 
     //
-    const carPosH =  playerCurve-trackCurve;
-    const carX = (w / 2) + ((w*carPosH)/2) - 4;
+    const carPosH = playerCurve - trackCurve;
+    const carX = (w / 2) + ((w * carPosH) / 2) - 4;
     const carY = h - 20;
     //draw car
     ctx.fillStyle = 'blue';
-    ctx.fillRect(carX, carY, 8, 10);
+    ctx.fillRect( Math.floor(carX),  Math.floor(carY), 8, 10);
+
+    //end loop
+    console.log('frame: ', fps) 
+  
+    window.requestAnimationFrame(loop);
+
 }
 
 /////////////Key inputs///////////////////
@@ -135,3 +180,5 @@ const logKeyUp = (e) => {
 
 document.addEventListener("keyup", logKeyUp);
 document.addEventListener("keydown", logKeyDown);
+
+run();

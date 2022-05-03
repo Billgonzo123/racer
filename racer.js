@@ -106,22 +106,22 @@ function loop() {
 
         //draw hills
 
-        for (x = 0; x < w; x++) {
-            const hillHeight = Math.abs(Math.sin(x * 0.01 + trackCurve) * 16.0);
+        // for (x = 0; x < w; x++) {
+        //     const hillHeight = Math.abs(Math.sin(x * 0.01 + trackCurve) * 16.0);
 
-            for (let y = 0; y < h / 2; y++) {
-                const pixelindex = (y * w + x) * 4;
-                const color = [0, 255, 0]
-                imageData.data[pixelindex] = color[0];     // Red
-                imageData.data[pixelindex + 1] = color[1]; // Green
-                imageData.data[pixelindex + 2] = color[2];  // Blue
-                imageData.data[pixelindex + 3] = 255;   // Alpha
+        //     for (let y = -hillHeight; y < h/2; y++) {
+        //         const pixelindex = (y * w + x) * 4;
+        //         const color = [0, 255, 0]
+        //         imageData.data[pixelindex] = color[0];     // Red
+        //         imageData.data[pixelindex + 1] = color[1]; // Green
+        //         imageData.data[pixelindex + 2] = color[2];  // Blue
+        //         imageData.data[pixelindex + 3] = 255;   // Alpha
 
-                // ctx.fillStyle = 'green';
-                // ctx.fillRect(Math.floor(x), Math.floor(y), 1, 1);
+        //         // ctx.fillStyle = 'green';
+        //         // ctx.fillRect(Math.floor(x), Math.floor(y), 1, 1);
 
-            }
-        }
+        //     }
+        // }
 
         //draw track
         for (y = h / 2; y < h; y++) {
@@ -143,6 +143,16 @@ function loop() {
             const rightClip = (midPoint + roadWidth) * w;
 
             for (let x = 0; x < w; x++) {
+                ///render top
+                const hillHeight = Math.abs(Math.sin(x * 0.01 + trackCurve) * 16.0);
+                const pixelindexTop = (((h / 2) - hillHeight) * w + x) * 4;
+                const colorB = [0, 255, 0]
+                imageData.data[pixelindexTop] = colorB[0];     // Red
+                imageData.data[pixelindexTop + 1] = colorB[1]; // Green
+                imageData.data[pixelindexTop + 2] = colorB[2];  // Blue
+                imageData.data[pixelindexTop + 3] = 255;   // Alpha
+                
+                //renderBottom
                 const pixelindex = (y * w + x) * 4;
                 if (x >= 0 && x < leftGrass) color = grassColor;
                 if (x >= leftGrass && x < leftClip) color = clipColor;

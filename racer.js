@@ -8,10 +8,12 @@ let playerCurve = 0;
 let lap = 1;
 let carX = 0;
 let carY = 0;
+let carD = 0; //direction -1 0 1
 
 let ctx = 0;
 let w = 0;
 let h = 0;
+let mid = 50
 let imageData = 0;
 let seconds = 0;
 let dk = 0; //day\night effect
@@ -34,20 +36,17 @@ for (let i = 0; i < trackArray.length; i++) {
     trackLength += trackArray[i][1];
 }
 
-
-
 function run() {
     const canvas = document.getElementById('game-window');
     if (canvas.getContext) {
         ctx = canvas.getContext('2d', { alpha: false });
         w = canvas.width;
         h = canvas.height;
+        mid = h/2;
         imageData = ctx.createImageData(w, h)
         window.requestAnimationFrame(loop)
     }
 }
-
-
 
 function loop() {
     setInterval(() => {
@@ -63,7 +62,9 @@ function loop() {
             startTime = time;
             frame = 0;
         }
-
+        //--------------------------//
+        //   Pre-draw calculations  //
+        //--------------------------//
         if (keysPressed.includes('w')) {
             speed += 0.25;
         } else {
@@ -72,18 +73,28 @@ function loop() {
         if (keysPressed.includes('s')) {
             speed -= 1;
         }
-        if (keysPressed.includes('a') && speed > 0) playerCurve -= (.015);
-        if (keysPressed.includes('d') && speed > 0) playerCurve += (.015);
-
-        //if you are outside the track, force slow down
-        if (Math.abs(playerCurve - trackCurve) >= 0.75) speed -= 1;
+        carD = 0;
+        if (keysPressed.includes('a') && speed > 0) {
+            carD = -1;
+            playerCurve -= (.015);
+        }
+        if (keysPressed.includes('d') && speed > 0) {
+            carD = 1;
+            playerCurve += (.015);
+        }
+        //----------------------------------------------//
+        //if you are outside the track, force slow down //
+        //----------------------------------------------//
+        if (Math.abs(playerCurve - trackCurve) >= 0.55) speed -= .1*speed;
 
         //set speed limits
         if (speed < 0) speed = 0;
         if (speed > 140) speed = 140;
         //keep track of how far car has traveled
         carDistance += speed;
+        //-----------------------------------------//
         //keep track of where we are on the track
+        //----------------------------------------//
         let offSet = 0;
         let trackSection = 0;
         //find the current track section based off the car distance
@@ -106,18 +117,22 @@ function loop() {
 
         //car positions
         const carPosH = playerCurve - trackCurve;
-        carX = (w / 2) + ((w * carPosH) / 2) - 4;
+        carW = w*.15;
+        carM = carW/2
+        carX = (w / 2) + ((w * carPosH) / 2) -carM+1;
         carY = h - 20;
+       
 
-
-        //draw 
-        for (y = h / 2; y < h; y++) {
+        //--------------------------//
+        //      Begin Draw          //
+        //--------------------------//
+        for (y = mid; y < h; y++) {
 
             // make track calculations
-            dk = (seconds < 130) ? seconds : 130;//to darken color over time
-            const gY = y*2;//to create a gradient color
-            const perspective = (y - h / 2) / (h / 2);
-         
+            dk = (seconds*100 < 160) ? seconds : 160;//to darken color over time
+            const gY = y * 2;//to create a gradient color
+            const perspective = (y - mid) / (mid);
+
             const midPoint = 0.5 + currentCurve * Math.pow(1 - perspective, 3);
             let roadWidth = 0.1 + perspective * 0.8;
             const clipWidth = roadWidth * 0.15;
@@ -133,55 +148,66 @@ function loop() {
             const rightGrass = (midPoint + roadWidth + clipWidth) * w;
             const rightClip = (midPoint + roadWidth) * w;
 
-
             for (let x = 0; x < w; x++) {
-                ///rendraw  top (hills and sky)
+                //--------------------------//
+                ///Draw  Top (hills and sky)//
+                //--------------------------//
                 const hillHeight = Math.floor(Math.abs(Math.sin(x * 0.01 + trackCurve) * 16.0));
-                //for (let y = 0; y < h/2; y++) {
-                const pixelindexTop = (((y - (h / 2)) * w + x) * 4);
-                let colorB = (y > (h) - hillHeight) ? [55 - y * perspective - (dk / 10), 155 - y * perspective - (dk / 10), 55 - y * perspective - (dk / 10)] : [100 + (y * 2) - dk, 100 - dk, 255 - dk];
-                if (y === (h) - hillHeight) colorB = [165 - y * perspective + dk / 2, 155 - y * perspective - dk, 155 - y * perspective + dk / 4];
+                const pixelindexTop = (((y - (mid)) * w + x) * 4);//Find RGBA pixel index for imageData
+                let colorB = (y > (h) - hillHeight) ? [55 - y * perspective - (dk / 5), 155 - y * perspective - (dk /5), 55 - y * perspective - (dk / 10)] : [100 + (y * 2) - dk, 100 - dk, 255 - dk];
+                //hill border color
+                if (y === (h) - hillHeight) colorB = [165 - gY * perspective + dk / 2, 155 - y * perspective - dk, 155 - gY * perspective + dk / 4];
+                //-------Set Pixel Data-------//
                 imageData.data[pixelindexTop] = colorB[0];     // Red
                 imageData.data[pixelindexTop + 1] = colorB[1]; // Green
                 imageData.data[pixelindexTop + 2] = colorB[2];  // Blue
                 imageData.data[pixelindexTop + 3] = 255;   // Alpha
 
-                //}
 
-                //renderBottom
-                const pixelindex = (y * w + x) * 4;
+                //--------------------------//
+                //       Draw Bottom        //
+                //--------------------------//
+                const pixelindex = (y * w + x) * 4; //find RGBA pixel index for imageData
                 if (x >= 0 && x < leftGrass) color = grassColor;
                 if (x >= leftGrass && x < leftClip) color = clipColor;
 
                 //if night draw light
                 //if (dk > 0 && y>h/2+10 && y<h-20 && x>carX+(y-carY) && x<carX+7-(y-carY))
-                if (dk > 120) {
-                    if (x >= leftClip && x < rightClip) color = (y < 100 - startLine + (20 * perspective) && y > 100 - startLine) ? [255, 255, 255] : [(100 + dk - gY), (100 + dk - gY), (100 + dk - gY)];
-                } else {
-                    if (x >= leftClip && x < rightClip) color = (y < 100 - startLine + (20 * perspective) && y > 100 - startLine) ? [255, 255, 255] : [(gY - dk), (gY - dk), (gY - dk)];
-                }
+                 
+         
+                if (x >= leftClip && x < rightClip) color = (y < 100 - startLine + (20 * perspective) && y > 100 - startLine) ? [255, 255, 255] : [(gY - dk), (gY - dk), (gY - dk)];
+                
                 if (x >= rightClip && x < rightGrass) color = clipColor;
                 if (x >= rightGrass && x < w) color = grassColor;
-                const row = (h / 2) + y;
-                imageData.data[pixelindex] = color[0];     // Red
-                imageData.data[pixelindex + 1] = color[1]; // Green
-                imageData.data[pixelindex + 2] = color[2];  // Blue
-                imageData.data[pixelindex + 3] = 255;   // Alpha
 
+                //create head lights
+                let circleBound =   Math.sqrt(Math.pow(x-(carX+(carD*11)+carM-1),2)+Math.pow(y-carY,2));
+                if (y> carY-6+(Math.abs(carD)*4)) circleBound = circleBound*perspective+15.5-(Math.abs(carD*3));
+                const light = (dk>90 && y < carY+3  && 31-(Math.abs(carD)) > circleBound) ? 100 : 0;
+              
+                //--------Set Pixel Data---------//
+                imageData.data[pixelindex] = color[0] + light;     // Red
+                imageData.data[pixelindex + 1] = color[1] + light; // Green
+                imageData.data[pixelindex + 2] = color[2] + light;  // Blue
+                imageData.data[pixelindex + 3] = 255;   // Alpha
 
             }
         }
-        // ctx.fillStyle = 'blue'
-        // ctx.fillRect(0,0,w,h/2)
-        //render entire image
+        //--------------------------//
+        //   Render Entire Image    //
+        //--------------------------//
         ctx.putImageData(imageData, 0, 0);
         //
-
-        //draw car
-
+        //--------------------------//
+        //        Draw Car          //
+        //--------------------------//
         ctx.fillStyle = 'blue';
-        ctx.fillRect(Math.floor(carX), Math.floor(carY), 8, 10);
-
+        ctx.fillRect(Math.floor(carX+2), Math.floor(carY-6), carW-4, 3);
+        ctx.fillRect(Math.floor(carX+carM-2), Math.floor(carY+3-6), 4, 3);
+        ctx.fillRect(Math.floor(carX), Math.floor(carY+6-6), carW, 4);
+        ctx.fillStyle = 'black';
+        ctx.fillRect(Math.floor(carX), Math.floor(carY+4-6), 3, 7);
+        ctx.fillRect(Math.floor(carX+carW-3), Math.floor(carY+4-6), 3, 7);
         //end loop
         //loop();
         //window.requestAnimationFrame(loop);

@@ -5,6 +5,7 @@ let speed = 0;
 let currentCurve = 0;
 let trackCurve = 0;
 let playerCurve = 0;
+let mid =50;
 let lap = 1;
 let carX = 0;
 let carY = 0;
@@ -96,6 +97,9 @@ function loop() {
             carDistance = 0;
             lap++;
         }
+        //------------------------------//
+        //-----Pre draw calculations----//
+        //-----------------------------//
         //find the target track curve after finding trackSection index
         const targetCurve = trackArray[trackSection - 1][0];
         const curveDiff = (targetCurve - currentCurve) * (speed / 14000);
@@ -108,17 +112,20 @@ function loop() {
         const carPosH = playerCurve - trackCurve;
         carX = (w / 2) + ((w * carPosH) / 2) - 4;
         carY = h - 20;
-
-
-        //draw 
-        for (y = h / 2; y < h; y++) {
+        //hills on road - simple sin wave for now
+        const midDif = -Math.floor(Math.abs(Math.sin(carDistance/1000 * 0.1)*15))
+         mid = 50- midDif
+        console.log(Math.floor(Math.abs(Math.sin(carDistance/1000 * 0.1)*5)))
+        //--------------draw--------------// 
+        for (y = mid+midDif; y < h; y++) {
 
             // make track calculations
             dk = (seconds < 130) ? seconds : 130;//to darken color over time
             const gY = y*2;//to create a gradient color
-            const perspective = (y - h / 2) / (h / 2);
+            const perspective = (y - mid+midDif/2) / (mid);
          
             const midPoint = 0.5 + currentCurve * Math.pow(1 - perspective, 3);
+            //set Road width rel to perspective
             let roadWidth = 0.1 + perspective * 0.8;
             const clipWidth = roadWidth * 0.15;
             // grass color
@@ -135,26 +142,27 @@ function loop() {
 
 
             for (let x = 0; x < w; x++) {
-                ///rendraw  top (hills and sky)
+                //----------------------------//
+                ///draw  top (hills and sky)  //
+                //----------------------------//
                 const hillHeight = Math.floor(Math.abs(Math.sin(x * 0.01 + trackCurve) * 16.0));
-                //for (let y = 0; y < h/2; y++) {
-                const pixelindexTop = (((y - (h / 2)) * w + x) * 4);
-                let colorB = (y > (h) - hillHeight) ? [55 - y * perspective - (dk / 10), 155 - y * perspective - (dk / 10), 55 - y * perspective - (dk / 10)] : [100 + (y * 2) - dk, 100 - dk, 255 - dk];
-                if (y === (h) - hillHeight) colorB = [165 - y * perspective + dk / 2, 155 - y * perspective - dk, 155 - y * perspective + dk / 4];
+                const pixelindexTop = ((( y-mid) * w + x) * 4);
+                let colorB = (y > (h) - hillHeight-midDif/2) ? [55 - y * perspective - (dk / 10), 155 - y * perspective - (dk / 10), 55 - y * perspective - (dk / 10)] : [100 + (y * 2) - dk, 100 - dk, 255 - dk];
+                if (y === (h) - hillHeight-midDif/2) colorB = [165 - y * perspective + dk / 2, 155 - y * perspective - dk, 155 - y * perspective + dk / 4];
                 imageData.data[pixelindexTop] = colorB[0];     // Red
                 imageData.data[pixelindexTop + 1] = colorB[1]; // Green
                 imageData.data[pixelindexTop + 2] = colorB[2];  // Blue
                 imageData.data[pixelindexTop + 3] = 255;   // Alpha
 
-                //}
-
-                //renderBottom
-                const pixelindex = (y * w + x) * 4;
+                //----------------------------//
+                //        Draw Bottom         //
+                //----------------------------//
+                const pixelindex = ((y+midDif) * w + x) * 4;
                 if (x >= 0 && x < leftGrass) color = grassColor;
                 if (x >= leftGrass && x < leftClip) color = clipColor;
 
                 //if night draw light
-                //if (dk > 0 && y>h/2+10 && y<h-20 && x>carX+(y-carY) && x<carX+7-(y-carY))
+                //if (dk > 0 && y>mid+10 && y<h-20 && x>carX+(y-carY) && x<carX+7-(y-carY))
                 if (dk > 120) {
                     if (x >= leftClip && x < rightClip) color = (y < 100 - startLine + (20 * perspective) && y > 100 - startLine) ? [255, 255, 255] : [(100 + dk - gY), (100 + dk - gY), (100 + dk - gY)];
                 } else {
@@ -162,23 +170,16 @@ function loop() {
                 }
                 if (x >= rightClip && x < rightGrass) color = clipColor;
                 if (x >= rightGrass && x < w) color = grassColor;
-                const row = (h / 2) + y;
                 imageData.data[pixelindex] = color[0];     // Red
                 imageData.data[pixelindex + 1] = color[1]; // Green
                 imageData.data[pixelindex + 2] = color[2];  // Blue
                 imageData.data[pixelindex + 3] = 255;   // Alpha
-
-
             }
         }
-        // ctx.fillStyle = 'blue'
-        // ctx.fillRect(0,0,w,h/2)
         //render entire image
         ctx.putImageData(imageData, 0, 0);
-        //
-
+        
         //draw car
-
         ctx.fillStyle = 'blue';
         ctx.fillRect(Math.floor(carX), Math.floor(carY), 8, 10);
 

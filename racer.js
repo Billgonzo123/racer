@@ -131,7 +131,7 @@ function loop() {
             let roadWidth = 0.1 + perspective * 0.8;
             const clipWidth = roadWidth * 0.15;
             // grass color
-            const grassColor = (Math.sin(20 * Math.pow(1 - perspective, 3) + carDistance * .008) > 0) ? [0, 255, 0] : [255, 255, 0];
+            const grassColor = (Math.sin(20 * Math.pow(1 - perspective, 3) + carDistance * .008) > 0) ? [0, 220, 0] : [0, 150, 0];
             const clipColor = (Math.sin(40 * Math.pow(1 - perspective, 2) + carDistance * .02) > 0) ? [255, 0, 0] : [255, 255, 255];
             let color = [255, 0, 0];
             const startLine = Math.pow(1 - perspective, 2) + ((trackLength - carDistance) * .02);
@@ -144,9 +144,9 @@ function loop() {
 
             for (let x = 0; x < w; x++) {
                 ///render top
-                const hillHeight = Math.abs(Math.sin(x * 0.01 + trackCurve) * 16.0);
-                const pixelindexTop = (((h / 2) - hillHeight) * w + x) * 4;
-                const colorB = [0, 255, 0]
+                const hillHeight = Math.floor(Math.abs(Math.sin(x * 0.01 + trackCurve) * 16.0));
+                const pixelindexTop = ((y-(h / 2)+hillHeight) * w + x) * 4;
+                const colorB = [0, 200, 0]
                 imageData.data[pixelindexTop] = colorB[0];     // Red
                 imageData.data[pixelindexTop + 1] = colorB[1]; // Green
                 imageData.data[pixelindexTop + 2] = colorB[2];  // Blue

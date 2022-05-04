@@ -9,6 +9,8 @@ let lap = 1;
 let carX = 0;
 let carY = 0;
 let carD = 0; //direction -1 0 1
+const img = new Image();
+img.src = './img/up.png';
 
 let ctx = 0;
 let w = 0;
@@ -81,6 +83,18 @@ function loop() {
         if (keysPressed.includes('d') && speed > 0) {
             carD = 1;
             playerCurve += (.015);
+        }
+
+        switch(carD) {
+            case 0:
+            img.src = './img/up.png';
+            break;
+            case 1:
+            img.src = './img/right.png';
+            break;
+           case -1:
+            img.src = './img/left.png';
+            break;
         }
         //----------------------------------------------//
         //if you are outside the track, force slow down //
@@ -155,7 +169,8 @@ function loop() {
                 const pixelindexTop = (((y - (mid)) * w + x) * 4);//Find RGBA pixel index for imageData
                 let colorB = (y > (h) - hillHeight) ? [55 - y * perspective - (dk / 5), 155 - y * perspective - (dk / 5), 55 - y * perspective - (dk / 10)] : [100 + (y * 2) - dk, 100 - dk, 255 - dk];
                 //hill border color
-                if (y === (h) - hillHeight) colorB = [165 - gY * perspective + dk / 2, 155 - y * perspective - dk, 155 - gY * perspective + dk / 4];
+                if (y === (h) - hillHeight) colorB =
+                    [-100 + gY * perspective + dk / 4, -3 + y * perspective - dk / 3, -100 + gY * perspective + dk / 4];
                 //-------Set Pixel Data-------//
                 imageData.data[pixelindexTop] = colorB[0];     // Red
                 imageData.data[pixelindexTop + 1] = colorB[1]; // Green
@@ -175,16 +190,16 @@ function loop() {
                 const l = (dk > 90 && y < carY + 3 && 31 - (Math.abs(carD)) > circleBound) ? 150 : 0;
 
                 // Grass color
-                const grassColor = (Math.sin(20 * Math.pow(1 - perspective, 3) + carDistance * .008) > 0) ? 
-                [0, 10 + gY - dk + l, 0] : [0, 50 + gY - dk + l, 0];
+                const grassColor = (Math.sin(20 * Math.pow(1 - perspective, 3) + carDistance * .008) > 0) ?
+                    [0, 10 + gY - dk + l, 0] : [0, 50 + gY - dk + l, 0];
 
                 // clip color
                 const clipColor = (Math.sin(40 * Math.pow(1 - perspective, 2) + carDistance * .02) > 0) ?
-                    [100 + gY - dk+ l, 0, 0] : [100 + gY - dk+ l, 100 + gY - dk+ l, 100 + gY - dk+ l];
+                    [100 + gY - dk + l, 0, 0] : [100 + gY - dk + l, 100 + gY - dk + l, 100 + gY - dk + l];
 
                 //----Road Color----//
                 if (x >= leftClip && x < rightClip) color = (y < 100 - startLine + (20 * perspective) && y > 100 - startLine)
-                    ? [255, 255, 255] : [(gY - dk+ l), (gY - dk+ l), (gY - dk+ l)];
+                    ? [255, 255, 255] : [(gY - dk + l), (gY - dk + l), (gY - dk + l)];
 
                 //----Determine if pixel is not road----//
                 //----Set color based on this data-----//
@@ -209,13 +224,16 @@ function loop() {
         //--------------------------//
         //        Draw Car          //
         //--------------------------//
-        ctx.fillStyle = 'blue';
-        ctx.fillRect(Math.floor(carX + 2), Math.floor(carY - 6), carW - 4, 3);
-        ctx.fillRect(Math.floor(carX + carM - 2), Math.floor(carY + 3 - 6), 4, 3);
-        ctx.fillRect(Math.floor(carX), Math.floor(carY + 6 - 6), carW, 4);
-        ctx.fillStyle = 'black';
-        ctx.fillRect(Math.floor(carX), Math.floor(carY + 4 - 6), 3, 7);
-        ctx.fillRect(Math.floor(carX + carW - 3), Math.floor(carY + 4 - 6), 3, 7);
+        carX = Math.round(carX);
+        carY = Math.round(carY);
+        ctx.drawImage(img, carX - carM, carY - 12)
+        // ctx.fillStyle = 'blue';
+        // ctx.fillRect(Math.floor(carX + 2), Math.floor(carY - 6), carW - 4, 3);
+        // ctx.fillRect(Math.floor(carX + carM - 2), Math.floor(carY + 3 - 6), 4, 3);
+        // ctx.fillRect(Math.floor(carX), Math.floor(carY + 6 - 6), carW, 4);
+        // ctx.fillStyle = 'black';
+        // ctx.fillRect(Math.floor(carX), Math.floor(carY + 4 - 6), 3, 7);
+        // ctx.fillRect(Math.floor(carX + carW - 3), Math.floor(carY + 4 - 6), 3, 7);
         //end loop
         //loop();
         //window.requestAnimationFrame(loop);

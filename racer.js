@@ -213,7 +213,7 @@ function loop() {
             newLapTime = seconds-lapAcc;
             lapAcc += newLapTime;
             lapEl.appendChild(lapTime);
-            lapTime.textContent = `${lap}: ${newLapTime}`;
+            lapTime.textContent = `Lap ${lap}: ${newLapTime}s`;
             carDistance = 0;
             lap++;
         }

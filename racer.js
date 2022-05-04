@@ -171,7 +171,7 @@ function loop() {
         }
 
         if (Math.abs(targetCurve - currentCurve) < .2 || speed <= 170) {
-            if (!keysPressed.includes('s') || speed < 5) tireGain.gain.value = 0;
+            if (!keysPressed.includes('s') || speed < 50) tireGain.gain.value = 0;
         }
 
         switch (carD) {

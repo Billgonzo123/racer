@@ -64,8 +64,7 @@ var startTime = Date.now();
 var frame = 0;
 // set track sections [curvatrue, dist]
 const trackArray = [
-    [0, 30000000],
-    [0, 20000],
+    [0, 30000],
     [1, 20000],
     [0, 20000],
     [-1, 20000],

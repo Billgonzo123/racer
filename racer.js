@@ -170,7 +170,7 @@ function loop() {
             }
         }
 
-        if (Math.abs(targetCurve - currentCurve) < .2 || speed <= 170) {
+        if (Math.abs(targetCurve - currentCurve) < .2 || speed <= 160) {
             if (!keysPressed.includes('x') || speed < 50) tireGain.gain.value = 0;
         }
 

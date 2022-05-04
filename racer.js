@@ -15,7 +15,11 @@ catch (e) {
 const engSnd = audioCtx.createOscillator();
 engSnd.frequency.setValueAtTime(0, audioCtx.currentTime); // value in hertz
 engSnd.type = 'square';
-engSnd.connect(audioCtx.destination);
+const engGain = audioCtx.createGain();
+engGain.gain.value = .5;
+engSnd.connect(engGain);
+engGain.connect(audioCtx.destination);
+
 engSnd.start();
 // Tire skreach
 const tireSnd = audioCtx.createOscillator();
@@ -145,7 +149,7 @@ function loop() {
         if (keysPressed.includes('a') && speed > 0) {
             carD = -1;
             playerCurve -= (.015);
-            if (Math.abs(targetCurve - currentCurve) > .2 && speed>170) tireGain.gain.value = .6;; 
+            if (Math.abs(targetCurve - currentCurve) > .2 && speed>170) tireGain.gain.value = .3; 
         } else {
             if (!keysPressed.includes('d') ) {
                 tireGain.gain.value = 0;
@@ -155,7 +159,7 @@ function loop() {
         if (keysPressed.includes('d') && speed > 0) {
             carD = 1;
             playerCurve += (.015);
-            if (Math.abs(targetCurve - currentCurve) > .2 && speed>170) tireGain.gain.value = .6; 
+            if (Math.abs(targetCurve - currentCurve) > .2 && speed>170) tireGain.gain.value = .3; 
         } else {
             if ( !keysPressed.includes('a')) {
                 tireGain.gain.value = 0;

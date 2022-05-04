@@ -23,6 +23,6 @@ body {
     /* compensate for (0,0) being top left by shifting up and left 50% of elements dimentions */
     image-rendering: pixelated;
     transform-origin: top center;
-    transform:  scale(10);
+    transform:  scale(3);
     border: 2px solid black;
 }

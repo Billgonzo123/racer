@@ -11,7 +11,8 @@ let carY = 0;
 let carD = 0; //direction -1 0 1
 const img = new Image();
 img.src = './img/up.png';
-
+const myFont = new FontFace('myFont', 'url(./tiny.ttf)');
+const hud = document.getElementById('hud');
 let ctx = 0;
 let w = 0;
 let h = 0;
@@ -52,6 +53,8 @@ function run() {
 
 function loop() {
     setInterval(() => {
+   
+
 
         var time = Date.now();
         frame++;
@@ -70,21 +73,28 @@ function loop() {
         if (keysPressed.includes('w')) {
             let acc = 0;
             switch (true) {
-                case (speed < 80):
+                case (speed < 60):
+                    acc = .45;
+                    break;
+                case (speed >= 60 && speed< 103):
                     acc = .35;
                     break;
-                case (speed < 143):
+                case (speed >= 103 && speed <155):
                     acc = .27;
                     break;
-                case (speed >= 125):
+                case (speed >= 155 && speed < 195):
                     acc = .16;
                     break;
-                case (speed > 203):
-                    acc = .08;
+                case (speed >= 195 && speed < 219):
+                    acc = .1;
                     break;
+                    case (speed >= 219):
+                        acc = .01;
+                        break;
                 default:
                     acc = .25
             }
+            console.log(acc)
             speed += acc;
         } else {
             speed -= 0.17;
@@ -144,7 +154,7 @@ function loop() {
         currentCurve += curveDiff;
 
         //change this float to adjust how hard the car is pushed in the opposite direction of the curve
-        trackCurve += currentCurve * (.00024 * (speed));
+        trackCurve += currentCurve * (.00019 * (speed));
 
         //car positions
         const carPosH = playerCurve - trackCurve;
@@ -213,7 +223,7 @@ function loop() {
 
                 // clip color
                 const clipColor = (Math.sin(40 * Math.pow(1 - perspective, 2) + carDistance * .02) > 0) ?
-                    [100 + gY - dk + l, 0, 0] : [100 + gY - dk + l, 100 + gY - dk + l, 100 + gY - dk + l];
+                    [80 + gY - dk + l, 0, 0] : [80 + gY - dk + l, 80 + gY - dk + l, 80 + gY - dk + l];
 
                 //----Road Color----//
                 if (x >= leftClip && x < rightClip) color = (y < 100 - startLine + (20 * perspective) && y > 100 - startLine)
@@ -248,10 +258,10 @@ function loop() {
         //--------------------------//
         //        Draw Hud          //
         //--------------------------//
-        ctx.font = '8px monospace';
-        ctx.fillText(`Lap: ${lap}`, 6, 8);
-        ctx.fillText(`Time: ${seconds} sec`, 6, 20);
-        ctx.fillText(`Speed: ${Math.round(speed)} mph`, 6, 32);
+
+       hud.innerHTML = `Lap: ${lap} \
+        Time: ${seconds} sec
+        Speed: ${Math.round(speed)} mph`
         //end loop
         //loop();
         //window.requestAnimationFrame(loop);

@@ -131,7 +131,7 @@ function loop() {
 
         //car positions
         const carPosH = playerCurve - trackCurve;
-        carW = w * .15;
+        carW = 36;
         carM = carW / 2
         carX = (w / 2) + ((w * carPosH) / 2) - carM + 1;
         carY = h - 20;
@@ -170,7 +170,8 @@ function loop() {
                 let colorB = (y > (h) - hillHeight) ? [55 - y * perspective - (dk / 5), 155 - y * perspective - (dk / 5), 55 - y * perspective - (dk / 10)] : [100 + (y * 2) - dk, 100 - dk, 255 - dk];
                 //hill border color
                 if (y === (h) - hillHeight) colorB =
-                    [-100 + gY * perspective + dk / 4, -3 + y * perspective - dk / 3, -100 + gY * perspective + dk / 4];
+                    [ 245 - dk / 1.6,  130 - dk , 230 - dk/1.3 ];
+                    //[-80 + gY*2 * perspective + dk / 4,  -50 + gY * perspective - dk / 6, -80 + gY*2 * perspective + dk / 4];
                 //-------Set Pixel Data-------//
                 imageData.data[pixelindexTop] = colorB[0];     // Red
                 imageData.data[pixelindexTop + 1] = colorB[1]; // Green
@@ -187,7 +188,7 @@ function loop() {
                 let circleBound = Math.sqrt(Math.pow(x - (carX + (carD * 11) + carM - 1), 2) + Math.pow(y - carY, 2));
                 if (y > carY - 6 + (Math.abs(carD) * 4)) circleBound = circleBound * perspective + 15.5 - (Math.abs(carD * 3));
 
-                const l = (dk > 90 && y < carY + 3 && 31 - (Math.abs(carD)) > circleBound) ? 150 : 0;
+                const l = (dk > 60 && y < carY + 3 && 31 - (Math.abs(carD)) > circleBound) ? dk : 0;
 
                 // Grass color
                 const grassColor = (Math.sin(20 * Math.pow(1 - perspective, 3) + carDistance * .008) > 0) ?
@@ -226,14 +227,7 @@ function loop() {
         //--------------------------//
         carX = Math.round(carX);
         carY = Math.round(carY);
-        ctx.drawImage(img, carX - carM, carY - 12)
-        // ctx.fillStyle = 'blue';
-        // ctx.fillRect(Math.floor(carX + 2), Math.floor(carY - 6), carW - 4, 3);
-        // ctx.fillRect(Math.floor(carX + carM - 2), Math.floor(carY + 3 - 6), 4, 3);
-        // ctx.fillRect(Math.floor(carX), Math.floor(carY + 6 - 6), carW, 4);
-        // ctx.fillStyle = 'black';
-        // ctx.fillRect(Math.floor(carX), Math.floor(carY + 4 - 6), 3, 7);
-        // ctx.fillRect(Math.floor(carX + carW - 3), Math.floor(carY + 4 - 6), 3, 7);
+        ctx.drawImage(img, carX, carY - 12)
         //end loop
         //loop();
         //window.requestAnimationFrame(loop);

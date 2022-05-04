@@ -9,6 +9,8 @@ let lap = 1;
 let carX = 0;
 let carY = 0;
 let carD = 0; //direction -1 0 1
+let acc = 0;
+
 const img = new Image();
 img.src = './img/up.png';
 const myFont = new FontFace('myFont', 'url(./tiny.ttf)');
@@ -24,7 +26,7 @@ var startTime = Date.now();
 var frame = 0;
 // set track sections [curvatrue, dist]
 const trackArray = [
-    [0, 5000],
+    [0, 40000],
     [0, 20000],
     [1, 20000],
     [0, 20000],
@@ -53,7 +55,7 @@ function run() {
 
 function loop() {
     setInterval(() => {
-   
+
 
 
         var time = Date.now();
@@ -70,34 +72,40 @@ function loop() {
         //--------------------------//
         //   Pre-draw calculations  //
         //--------------------------//
+
         if (keysPressed.includes('w')) {
-            let acc = 0;
             switch (true) {
-                case (speed < 60):
+                case (speed < 45):
                     acc = .45;
                     break;
-                case (speed >= 60 && speed< 103):
+                case (speed >= 45 && speed < 80):
                     acc = .35;
                     break;
-                case (speed >= 103 && speed <155):
+                case (speed >= 80 && speed < 103):
                     acc = .27;
                     break;
+                case (speed >= 103 && speed < 155):
+                    acc = .22;
+                    break;
                 case (speed >= 155 && speed < 195):
-                    acc = .16;
+                    acc = .18;
                     break;
                 case (speed >= 195 && speed < 219):
-                    acc = .1;
+                    acc = .14;
                     break;
-                    case (speed >= 219):
-                        acc = .01;
-                        break;
+                case (speed >= 219 && speed < 231):
+                    acc = .14;
+                    break;
+                case (speed >= 231):
+                    speed = 229
+                    acc = .16;
+                    break;
                 default:
                     acc = .25
             }
-            console.log(acc)
             speed += acc;
         } else {
-            speed -= 0.17;
+            speed -= 0.09;
         }
         if (keysPressed.includes('s')) {
             speed -= 1;
@@ -130,7 +138,7 @@ function loop() {
 
         //set speed limits
         if (speed < 0) speed = 0;
-        if (speed > 231) speed = 231;
+        if (speed > 232) speed = 232;
         //keep track of how far car has traveled
         carDistance += speed;
         //-----------------------------------------//
@@ -259,12 +267,13 @@ function loop() {
         //        Draw Hud          //
         //--------------------------//
 
-       hud.innerHTML = `Lap: ${lap} \
+        hud.innerHTML = `Lap: ${lap} \
         Time: ${seconds} sec
         Speed: ${Math.round(speed)} mph`
         //end loop
         //loop();
         //window.requestAnimationFrame(loop);
+        oscillator.frequency.setValueAtTime(speed * (3 * acc), audioCtx.currentTime); // value in hertz
 
     }, 16.667)
 
@@ -286,3 +295,14 @@ document.addEventListener("keyup", logKeyUp);
 document.addEventListener("keydown", logKeyDown);
 
 run();
+
+// create web audio api context
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+// create Oscillator node
+const oscillator = audioCtx.createOscillator();
+oscillator.frequency.setValueAtTime(0, audioCtx.currentTime); // value in hertz
+
+oscillator.type = 'square';
+oscillator.connect(audioCtx.destination);
+oscillator.start();

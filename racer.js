@@ -327,7 +327,7 @@ function loop() {
         const gear = (speed >= 181) ? (speed / 1064) : acc;
         engSnd.frequency.setValueAtTime(speed * (3 * gear), audioCtx.currentTime); // value in hertz
         const tireFeq = (Math.floor(carDistance) % 2)
-        tireSnd.frequency.setValueAtTime(780 + (100 * tireFeq)+(speed), audioCtx.currentTime)
+        tireSnd.frequency.setValueAtTime(920 + (50 * tireFeq), audioCtx.currentTime)
 
     }, 16.667)
 

@@ -138,7 +138,7 @@ function loop() {
             }
             speed += acc;
         } else {
-            speed -= 0.09;
+            speed -= 0.2;
         }
         if (keysPressed.includes('s')) {
             speed -= 1;

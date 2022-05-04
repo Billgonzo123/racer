@@ -64,7 +64,7 @@ var startTime = Date.now();
 var frame = 0;
 // set track sections [curvatrue, dist]
 const trackArray = [
-    [0, 30000],
+    [0, 30000000],
     [0, 20000],
     [1, 20000],
     [0, 20000],
@@ -145,7 +145,7 @@ function loop() {
             speed -= 1;
             if (speed > 188) {
                 tireGain.gain.value = .3;
-                speed -=.5;
+                speed -=5;
             }
         }
         //init car direction

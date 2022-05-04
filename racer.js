@@ -92,6 +92,7 @@ function run() {
 
 function loop() {
     setInterval(() => {
+        //console.log(keysPressed)
         let carPosH = (playerCurve - trackCurve);
         var time = Date.now();
         frame++;
@@ -107,7 +108,7 @@ function loop() {
         //   Pre-draw calculations  //
         //--------------------------//
 
-        if (keysPressed.includes('w')) {
+        if (keysPressed.includes('z')) {
             switch (true) {
                 case (speed < 45):
                     acc = .45;
@@ -140,7 +141,7 @@ function loop() {
         } else {
             speed -= 0.2;
         }
-        if (keysPressed.includes('s')) {
+        if (keysPressed.includes('x')) {
             speed -= 1;
             if (speed > 188) {
                 tireGain.gain.value = .3;
@@ -149,28 +150,28 @@ function loop() {
         }
         //init car direction
         carD = 0;
-        if (keysPressed.includes('a') && speed > 0) {
+        if (keysPressed.includes('arrowleft') && speed > 0) {
             carD = -1;
             playerCurve -= (.015);
             if (Math.abs(targetCurve - currentCurve) > .2 && speed > 160) tireGain.gain.value = .3;
         } else {
-            if (!keysPressed.includes('d') && !keysPressed.includes('s')) {
+            if (!keysPressed.includes('arrowright') && !keysPressed.includes('x')) {
                 tireGain.gain.value = 0;
             }
         }
 
-        if (keysPressed.includes('d') && speed > 0) {
+        if (keysPressed.includes('arrowright') && speed > 0) {
             carD = 1;
             playerCurve += (.015);
             if (Math.abs(targetCurve - currentCurve) > .2 && speed > 160) tireGain.gain.value = .3;
         } else {
-            if (!keysPressed.includes('a') && !keysPressed.includes('s')) {
+            if (!keysPressed.includes('arrowleft') && !keysPressed.includes('x')) {
                 tireGain.gain.value = 0;
             }
         }
 
         if (Math.abs(targetCurve - currentCurve) < .2 || speed <= 170) {
-            if (!keysPressed.includes('s') || speed < 50) tireGain.gain.value = 0;
+            if (!keysPressed.includes('x') || speed < 50) tireGain.gain.value = 0;
         }
 
         switch (carD) {

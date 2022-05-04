@@ -209,7 +209,7 @@ function loop() {
         }
         if (trackSection === trackArray.length && carDistance > offSet) {
             const lapTime = document.createElement('li');
-            newLapTime = time-newLapTime;
+            newLapTime = seconds-newLapTime;
             lapEl.appendChild(lapTime);
             lapTime.textContent = `${lap}: ${newLapTime}`;
             carDistance = 0;

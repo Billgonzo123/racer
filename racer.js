@@ -16,7 +16,7 @@ const engSnd = audioCtx.createOscillator();
 engSnd.frequency.setValueAtTime(0, audioCtx.currentTime); // value in hertz
 engSnd.type = 'square';
 const engGain = audioCtx.createGain();
-engGain.gain.value = .5;
+engGain.gain.value = .4;
 engSnd.connect(engGain);
 engGain.connect(audioCtx.destination);
 
@@ -143,15 +143,19 @@ function loop() {
         }
         if (keysPressed.includes('s')) {
             speed -= 1;
+            if (speed > 188) {
+                tireGain.gain.value = .3;
+                speed -=.5;
+            }
         }
         //init car direction
         carD = 0;
         if (keysPressed.includes('a') && speed > 0) {
             carD = -1;
             playerCurve -= (.015);
-            if (Math.abs(targetCurve - currentCurve) > .2 && speed>170) tireGain.gain.value = .3; 
+            if (Math.abs(targetCurve - currentCurve) > .2 && speed > 160) tireGain.gain.value = .3;
         } else {
-            if (!keysPressed.includes('d') ) {
+            if (!keysPressed.includes('d') && !keysPressed.includes('s')) {
                 tireGain.gain.value = 0;
             }
         }
@@ -159,14 +163,16 @@ function loop() {
         if (keysPressed.includes('d') && speed > 0) {
             carD = 1;
             playerCurve += (.015);
-            if (Math.abs(targetCurve - currentCurve) > .2 && speed>170) tireGain.gain.value = .3; 
+            if (Math.abs(targetCurve - currentCurve) > .2 && speed > 160) tireGain.gain.value = .3;
         } else {
-            if ( !keysPressed.includes('a')) {
+            if (!keysPressed.includes('a') && !keysPressed.includes('s')) {
                 tireGain.gain.value = 0;
             }
         }
 
-        if (Math.abs(targetCurve - currentCurve) < .2 || speed<=170 ) tireGain.gain.value = 0;;
+        if (Math.abs(targetCurve - currentCurve) < .2 || speed <= 170) {
+            if (!keysPressed.includes('s') || speed < 5) tireGain.gain.value = 0;
+        }
 
         switch (carD) {
             case 0:
@@ -205,7 +211,7 @@ function loop() {
             lap++;
         }
         //find the target track curve after finding trackSection index
-         targetCurve = trackArray[trackSection - 1][0];
+        targetCurve = trackArray[trackSection - 1][0];
         const curveDiff = (targetCurve - currentCurve) * (speed / 14000);
         currentCurve += curveDiff;
 
@@ -213,7 +219,7 @@ function loop() {
         trackCurve += currentCurve * (.00019 * (speed));
 
         //car positions
-     
+
         carW = 36;
         carM = (carW / 2) - 1
         carX = (w / 2) + ((w * carPosH) / 2) - carM;

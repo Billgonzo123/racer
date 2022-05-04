@@ -210,7 +210,7 @@ function loop() {
         if (trackSection === trackArray.length && carDistance > offSet) {
             const lapTime = document.createElement('li');
             newLapTime = time-newLapTime;
-            lapTime.appendChild(lapEl);
+            lapEl.appendChild(lapTime);
             lapTime.innerHTML = `${lap}: ${newLapTime}`;
             carDistance = 0;
             lap++;

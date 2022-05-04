@@ -1,13 +1,33 @@
 // create web audio api context
-const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+let audioCtx
+try {
+    // Fix up for prefixing
+    window.AudioContext = window.AudioContext || window.webkitAudioContext;
+    audioCtx = new AudioContext();
+}
+catch (e) {
+    alert('Web Audio API is not supported in this browser');
+}
 
-// create Oscillator node
-const oscillator = audioCtx.createOscillator();
-oscillator.frequency.setValueAtTime(0, audioCtx.currentTime); // value in hertz
 
-oscillator.type = 'square';
-oscillator.connect(audioCtx.destination);
-oscillator.start();
+// create Oscillator(s) node
+// Engine 
+const engSnd = audioCtx.createOscillator();
+engSnd.frequency.setValueAtTime(0, audioCtx.currentTime); // value in hertz
+engSnd.type = 'square';
+engSnd.connect(audioCtx.destination);
+engSnd.start();
+// Tire skreach
+const tireSnd = audioCtx.createOscillator();
+tireSnd.frequency.setValueAtTime(0, audioCtx.currentTime); // value in hertz
+tireSnd.type = 'sine';
+const tireGain = audioCtx.createGain();
+tireGain.gain.value = 1;
+tireSnd.connect(tireGain);
+tireGain.connect(audioCtx.destination);
+tireSnd.start()
+
+
 
 //---------Game Vars--------//
 let keysPressed = [];
@@ -15,6 +35,7 @@ let carDistance = 0;
 let speed = 0;
 let currentCurve = 0;
 let trackCurve = 0;
+let targetCurve = 0;
 let playerCurve = 0;
 let lap = 1;
 let carX = 0;
@@ -39,7 +60,7 @@ var startTime = Date.now();
 var frame = 0;
 // set track sections [curvatrue, dist]
 const trackArray = [
-    [0, 40000],
+    [0, 30000],
     [0, 20000],
     [1, 20000],
     [0, 20000],
@@ -68,16 +89,13 @@ function run() {
 
 function loop() {
     setInterval(() => {
-
-
-
+        let carPosH = (playerCurve - trackCurve);
         var time = Date.now();
         frame++;
         //frame rate counter and timer
         if (time - startTime > 1000) {
             console.clear();
             seconds++;
-
             console.log('FPS:', (frame / ((time - startTime) / 1000)).toFixed(1));
             startTime = time;
             frame = 0;
@@ -94,24 +112,23 @@ function loop() {
                 case (speed >= 45 && speed < 80):
                     acc = .35;
                     break;
-                case (speed >= 80 && speed < 103):
+                case (speed >= 80 && speed < 121):
                     acc = .27;
                     break;
-                case (speed >= 103 && speed < 155):
+                case (speed >= 121 && speed < 181):
                     acc = .22;
                     break;
-                case (speed >= 155 && speed < 195):
-                    acc = .18;
+                case (speed >= 181 && speed < 210):
+                    acc = .17;
                     break;
-                case (speed >= 195 && speed < 219):
-                    acc = .14;
+                case (speed >= 210 && speed < 219):
+                    acc = .11;
                     break;
                 case (speed >= 219 && speed < 255):
-                    acc = .14;
+                    acc = .09;
                     break;
                 case (speed >= 255):
-                    speed = 253
-                    acc = .16;
+                    acc = .02;
                     break;
                 default:
                     acc = .25
@@ -123,15 +140,29 @@ function loop() {
         if (keysPressed.includes('s')) {
             speed -= 1;
         }
+        //init car direction
         carD = 0;
         if (keysPressed.includes('a') && speed > 0) {
             carD = -1;
             playerCurve -= (.015);
+            if (Math.abs(targetCurve - currentCurve) > .2 && speed>170) tireGain.gain.value = .6;; 
+        } else {
+            if (!keysPressed.includes('d') ) {
+                tireGain.gain.value = 0;
+            }
         }
+
         if (keysPressed.includes('d') && speed > 0) {
             carD = 1;
             playerCurve += (.015);
+            if (Math.abs(targetCurve - currentCurve) > .2 && speed>170) tireGain.gain.value = .6; 
+        } else {
+            if ( !keysPressed.includes('a')) {
+                tireGain.gain.value = 0;
+            }
         }
+
+        if (Math.abs(targetCurve - currentCurve) < .2 || speed<=170 ) tireGain.gain.value = 0;;
 
         switch (carD) {
             case 0:
@@ -151,7 +182,7 @@ function loop() {
 
         //set speed limits
         if (speed < 0) speed = 0;
-        if (speed > 255) speed = 255;
+
         //keep track of how far car has traveled
         carDistance += speed;
         //-----------------------------------------//
@@ -170,7 +201,7 @@ function loop() {
             lap++;
         }
         //find the target track curve after finding trackSection index
-        const targetCurve = trackArray[trackSection - 1][0];
+         targetCurve = trackArray[trackSection - 1][0];
         const curveDiff = (targetCurve - currentCurve) * (speed / 14000);
         currentCurve += curveDiff;
 
@@ -178,7 +209,7 @@ function loop() {
         trackCurve += currentCurve * (.00019 * (speed));
 
         //car positions
-        const carPosH = playerCurve - trackCurve;
+     
         carW = 36;
         carM = (carW / 2) - 1
         carX = (w / 2) + ((w * carPosH) / 2) - carM;
@@ -286,7 +317,13 @@ function loop() {
         //end loop
         //loop();
         //window.requestAnimationFrame(loop);
-        oscillator.frequency.setValueAtTime(speed * (3 * acc), audioCtx.currentTime); // value in hertz
+        //----------------------//
+        //--------Sounds--------//
+        //----------------------//
+        const gear = (speed >= 181) ? (speed / 1064) : acc;
+        engSnd.frequency.setValueAtTime(speed * (3 * gear), audioCtx.currentTime); // value in hertz
+        const tireFeq = (Math.floor(carDistance) % 2)
+        tireSnd.frequency.setValueAtTime(780 + (100 * tireFeq)+(speed), audioCtx.currentTime)
 
     }, 16.667)
 
@@ -294,6 +331,7 @@ function loop() {
 
 /////////////Key inputs///////////////////
 const logKeyDown = (e) => {
+    audioCtx.resume();//must resume audio context with user input
     if (!keysPressed.includes(e.key)) keysPressed = [...keysPressed, e.key.toLowerCase()];
     //console.log(keysPressed)
 };

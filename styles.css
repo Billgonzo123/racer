@@ -9,7 +9,7 @@ body {
     background-color: rgb(0, 0, 0);
 }
 
-#hud{
+.hud{
     font-family: 'tiny';
     font-size:xxx-large;
     color: beige;

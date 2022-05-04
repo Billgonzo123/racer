@@ -31,8 +31,9 @@ tireSnd.connect(tireGain);
 tireGain.connect(audioCtx.destination);
 tireSnd.start()
 
-
-
+//---lap list element---//
+const lapEl = document.getElementById('lapTimes');
+let newLapTime = 0;
 //---------Game Vars--------//
 let keysPressed = [];
 let carDistance = 0;
@@ -52,7 +53,7 @@ img.src = './img/right.png';
 img.src = './img/left.png';
 img.src = './img/up.png';
 const myFont = new FontFace('myFont', 'url(./tiny.ttf)');
-const hud = document.getElementById('hud');
+const hudEl = document.getElementById('hudStats');
 let ctx = 0;
 let w = 0;
 let h = 0;
@@ -207,6 +208,10 @@ function loop() {
             trackSection++;
         }
         if (trackSection === trackArray.length && carDistance > offSet) {
+            const lapTime = document.createElement('li');
+            newLapTime = time-newLapTime;
+            lapTime.appendChild(lapEl);
+            lapTime.innerHTML = `${lap}: ${newLapTime}`;
             carDistance = 0;
             lap++;
         }
@@ -321,7 +326,7 @@ function loop() {
         //        Draw Hud          //
         //--------------------------//
 
-        hud.innerHTML = `Lap: ${lap} \
+        hudEl.innerHTML = `Lap: ${lap} \
         Time: ${seconds} sec
         Speed: ${Math.round(speed)} mph`
         //end loop

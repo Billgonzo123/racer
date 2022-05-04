@@ -1,4 +1,15 @@
+// create web audio api context
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
+// create Oscillator node
+const oscillator = audioCtx.createOscillator();
+oscillator.frequency.setValueAtTime(0, audioCtx.currentTime); // value in hertz
+
+oscillator.type = 'square';
+oscillator.connect(audioCtx.destination);
+oscillator.start();
+
+//---------Game Vars--------//
 let keysPressed = [];
 let carDistance = 0;
 let speed = 0;
@@ -12,6 +23,8 @@ let carD = 0; //direction -1 0 1
 let acc = 0;
 
 const img = new Image();
+img.src = './img/right.png';
+img.src = './img/left.png';
 img.src = './img/up.png';
 const myFont = new FontFace('myFont', 'url(./tiny.ttf)');
 const hud = document.getElementById('hud');
@@ -296,13 +309,4 @@ document.addEventListener("keydown", logKeyDown);
 
 run();
 
-// create web audio api context
-const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-// create Oscillator node
-const oscillator = audioCtx.createOscillator();
-oscillator.frequency.setValueAtTime(0, audioCtx.currentTime); // value in hertz
-
-oscillator.type = 'square';
-oscillator.connect(audioCtx.destination);
-oscillator.start();

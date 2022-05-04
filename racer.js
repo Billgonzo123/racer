@@ -68,7 +68,24 @@ function loop() {
         //   Pre-draw calculations  //
         //--------------------------//
         if (keysPressed.includes('w')) {
-            speed += 0.25;
+            let acc = 0;
+            switch (true) {
+                case (speed < 80):
+                    acc = .35;
+                    break;
+                case (speed < 143):
+                    acc = .27;
+                    break;
+                case (speed >= 125):
+                    acc = .16;
+                    break;
+                case (speed > 203):
+                    acc = .08;
+                    break;
+                default:
+                    acc = .25
+            }
+            speed += acc;
         } else {
             speed -= 0.17;
         }
@@ -85,16 +102,16 @@ function loop() {
             playerCurve += (.015);
         }
 
-        switch(carD) {
+        switch (carD) {
             case 0:
-            img.src = './img/up.png';
-            break;
+                img.src = './img/up.png';
+                break;
             case 1:
-            img.src = './img/right.png';
-            break;
-           case -1:
-            img.src = './img/left.png';
-            break;
+                img.src = './img/right.png';
+                break;
+            case -1:
+                img.src = './img/left.png';
+                break;
         }
         //----------------------------------------------//
         //if you are outside the track, force slow down //
@@ -103,7 +120,7 @@ function loop() {
 
         //set speed limits
         if (speed < 0) speed = 0;
-        if (speed > 140) speed = 140;
+        if (speed > 231) speed = 231;
         //keep track of how far car has traveled
         carDistance += speed;
         //-----------------------------------------//
@@ -127,13 +144,13 @@ function loop() {
         currentCurve += curveDiff;
 
         //change this float to adjust how hard the car is pushed in the opposite direction of the curve
-        trackCurve += currentCurve * (.00022 * (speed));
+        trackCurve += currentCurve * (.00024 * (speed));
 
         //car positions
         const carPosH = playerCurve - trackCurve;
         carW = 36;
-        carM = carW / 2
-        carX = (w / 2) + ((w * carPosH) / 2) - carM + 1;
+        carM = (carW / 2) - 1
+        carX = (w / 2) + ((w * carPosH) / 2) - carM;
         carY = h - 20;
 
 
@@ -170,8 +187,8 @@ function loop() {
                 let colorB = (y > (h) - hillHeight) ? [55 - y * perspective - (dk / 5), 155 - y * perspective - (dk / 5), 55 - y * perspective - (dk / 10)] : [100 + (y * 2) - dk, 100 - dk, 255 - dk];
                 //hill border color
                 if (y === (h) - hillHeight) colorB =
-                    [ 245 - dk / 1.6,  130 - dk , 230 - dk/1.3 ];
-                    //[-80 + gY*2 * perspective + dk / 4,  -50 + gY * perspective - dk / 6, -80 + gY*2 * perspective + dk / 4];
+                    [245 - dk / 1.6, 130 - dk, 230 - dk / 1.3];
+                //[-80 + gY*2 * perspective + dk / 4,  -50 + gY * perspective - dk / 6, -80 + gY*2 * perspective + dk / 4];
                 //-------Set Pixel Data-------//
                 imageData.data[pixelindexTop] = colorB[0];     // Red
                 imageData.data[pixelindexTop + 1] = colorB[1]; // Green
@@ -228,6 +245,13 @@ function loop() {
         carX = Math.round(carX);
         carY = Math.round(carY);
         ctx.drawImage(img, carX, carY - 12)
+        //--------------------------//
+        //        Draw Hud          //
+        //--------------------------//
+        ctx.font = '8px monospace';
+        ctx.fillText(`Lap: ${lap}`, 6, 8);
+        ctx.fillText(`Time: ${seconds} sec`, 6, 20);
+        ctx.fillText(`Speed: ${Math.round(speed)} mph`, 6, 32);
         //end loop
         //loop();
         //window.requestAnimationFrame(loop);

@@ -211,7 +211,7 @@ function loop() {
             const lapTime = document.createElement('li');
             newLapTime = time-newLapTime;
             lapEl.appendChild(lapTime);
-            lapTime.innerHTML = `${lap}: ${newLapTime}`;
+            lapTime.textContent = `${lap}: ${newLapTime}`;
             carDistance = 0;
             lap++;
         }

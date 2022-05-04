@@ -106,11 +106,11 @@ function loop() {
                 case (speed >= 195 && speed < 219):
                     acc = .14;
                     break;
-                case (speed >= 219 && speed < 231):
+                case (speed >= 219 && speed < 255):
                     acc = .14;
                     break;
-                case (speed >= 231):
-                    speed = 229
+                case (speed >= 255):
+                    speed = 253
                     acc = .16;
                     break;
                 default:
@@ -151,7 +151,7 @@ function loop() {
 
         //set speed limits
         if (speed < 0) speed = 0;
-        if (speed > 232) speed = 232;
+        if (speed > 255) speed = 255;
         //keep track of how far car has traveled
         carDistance += speed;
         //-----------------------------------------//

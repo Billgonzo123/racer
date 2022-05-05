@@ -44,6 +44,7 @@ let trackCurve = 0;
 let targetCurve = 0;
 let playerCurve = 0;
 let lap = 1;
+let position = 2;
 let carX = 0;
 let carY = 0;
 let carD = 0; //direction -1 0 1
@@ -342,7 +343,12 @@ function loop() {
         if (CPUd >= trackLength) CPUd = 0;
         CPUd +=CPUspeed;
         let maxSpd = 160;
-        if (CPUd<carDistance) maxSpd = speed+10;
+        if (CPUd<carDistance) {
+             position = 1;
+            maxSpd = speed+10;
+        }else {
+             position = 2;
+        }
         if (maxSpd<160) maxSpd = 160;
         (CPUspeed<maxSpd) ? CPUspeed+=.40 : CPUspeed = 160;
         const scale = CPUy/h
@@ -359,7 +365,8 @@ function loop() {
 
         hudEl.innerHTML = `Lap: ${lap} 
         Time: ${Math.round(seconds)} sec
-        Speed: ${Math.round(speed)} mph`
+        Speed: ${Math.round(speed)} mph
+        Pos: ${position}${(position===1)? "st" : "nd"}`
         //end loop
         //loop();
         //window.requestAnimationFrame(loop);

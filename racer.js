@@ -34,6 +34,7 @@ tireSnd.start()
 //---lap list element---//
 const lapEl = document.getElementById('lapTimes');
 let newLapTime = 0;
+let lapAcc = 0;
 //---------Game Vars--------//
 let keysPressed = [];
 let carDistance = 0;
@@ -210,9 +211,10 @@ function loop() {
         }
         if (trackSection === trackArray.length && carDistance > offSet) {
             const lapTime = document.createElement('li');
-            newLapTime = time-newLapTime;
-            lapTime.appendChild(lapEl);
-            lapTime.innerHTML = `${lap}: ${newLapTime/1000}`;
+            newLapTime = seconds-lapAcc;
+            lapAcc += newLapTime;
+            lapEl.appendChild(lapTime);
+            lapTime.textContent = `Lap ${lap}: ${newLapTime}s`;
             carDistance = 0;
             lap++;
         }

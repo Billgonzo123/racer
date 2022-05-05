@@ -49,10 +49,14 @@ let carY = 0;
 let carD = 0; //direction -1 0 1
 let acc = 0;
 
-const img = new Image();
-img.src = './img/right.png';
-img.src = './img/left.png';
-img.src = './img/up.png';
+const rightImg = new Image();
+rightImg.src = './img/right.png';
+const leftImg = new Image();
+leftImg.src = './img/left.png';
+const upImage = new Image();
+upImage.src = './img/up.png';
+
+let img = upImage;
 const myFont = new FontFace('myFont', 'url(./tiny.ttf)');
 const hudEl = document.getElementById('hudStats');
 let ctx = 0;
@@ -179,13 +183,13 @@ function loop() {
 
         switch (carD) {
             case 0:
-                img.src = './img/up.png';
+                img=upImage;
                 break;
             case 1:
-                img.src = './img/right.png';
+                img=rightImg;
                 break;
             case -1:
-                img.src = './img/left.png';
+                img=leftImg;
                 break;
         }
         //----------------------------------------------//

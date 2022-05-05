@@ -49,6 +49,9 @@ let carY = 0;
 let carD = 0; //direction -1 0 1
 let acc = 0;
 
+CPUy = 0;
+CPUx = 50;
+
 const rightImg = new Image();
 rightImg.src = './img/right.png';
 const leftImg = new Image();
@@ -102,7 +105,7 @@ function loop() {
         //console.log(keysPressed)
         let carPosH = (playerCurve - trackCurve);
         var time = Date.now();
-        seconds = ( (time-initTime)/1000);
+        seconds = ((time - initTime) / 1000);
         frame++;
         //frame rate counter and timer
         if (time - startTime > 1000) {
@@ -152,7 +155,7 @@ function loop() {
             speed -= 1;
             if (speed > 188) {
                 tireGain.gain.value = .3;
-                speed -=5;
+                speed -= 5;
             }
         }
         //init car direction
@@ -183,13 +186,13 @@ function loop() {
 
         switch (carD) {
             case 0:
-                img=upImage;
+                img = upImage;
                 break;
             case 1:
-                img=rightImg;
+                img = rightImg;
                 break;
             case -1:
-                img=leftImg;
+                img = leftImg;
                 break;
         }
         //----------------------------------------------//
@@ -215,10 +218,10 @@ function loop() {
         }
         if (trackSection === trackArray.length && carDistance > offSet) {
             const lapTime = document.createElement('li');
-            newLapTime = seconds-lapAcc;
+            newLapTime = seconds - lapAcc;
             lapAcc += newLapTime;
             lapEl.appendChild(lapTime);
-            lapTime.textContent = `Lap ${lap}: ${Math.round(1000*newLapTime)/1000 }s`;
+            lapTime.textContent = `Lap ${lap}: ${Math.round(1000 * newLapTime) / 1000}s`;
             carDistance = 0;
             lap++;
         }
@@ -255,6 +258,7 @@ function loop() {
             //create a color variable
             let color = [255, 0, 0];
             const startLine = Math.pow(1 - perspective, 2) + ((trackLength - carDistance) * .02);
+            const CPU = Math.pow(1 - perspective, 2) + ((10000 - carDistance) * .02)//this is how we make CPU players appear  
             //get half of road width. makes calculations easier for symetrical track
             roadWidth *= 0.5;
             const leftGrass = (midPoint - roadWidth - clipWidth) * w;
@@ -309,7 +313,14 @@ function loop() {
                 if (x >= leftGrass && x < leftClip) color = clipColor;
                 if (x >= rightClip && x < rightGrass) color = clipColor;
                 if (x >= rightGrass && x < w) color = grassColor;
-
+                
+                //--------CPUs-----------//
+                if (y === Math.round(100 - CPU + (20 * perspective))) 
+                {
+                    CPUy = y;
+                    CPUx = CPUx-(perspective/y)
+                }
+        
                 //--------Set Pixel Data---------//
                 imageData.data[pixelindex] = color[0]      // Red
                 imageData.data[pixelindex + 1] = color[1]  // Green
@@ -329,6 +340,7 @@ function loop() {
         carX = Math.round(carX);
         carY = Math.round(carY);
         ctx.drawImage(img, carX, carY - 12)
+        ctx.drawImage(img, CPUx, CPUy - 12)
         //--------------------------//
         //        Draw Hud          //
         //--------------------------//

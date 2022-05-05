@@ -62,6 +62,7 @@ let imageData = 0;
 let seconds = 0;
 let dk = 0; //day\night effect
 var startTime = Date.now();
+let initTime = Date.now();
 var frame = 0;
 // set track sections [curvatrue, dist]
 const trackArray = [
@@ -96,12 +97,12 @@ function loop() {
         //console.log(keysPressed)
         let carPosH = (playerCurve - trackCurve);
         var time = Date.now();
+        seconds = ( (time-initTime)/1000);
         frame++;
         //frame rate counter and timer
         if (time - startTime > 1000) {
-            console.clear();
-            seconds++;
-            console.log('FPS:', (frame / ((time - startTime) / 1000)).toFixed(1));
+            //console.clear();
+            //console.log('FPS:', (frame / ((time - startTime) / 1000)).toFixed(1));
             startTime = time;
             frame = 0;
         }
@@ -211,7 +212,7 @@ function loop() {
             const lapTime = document.createElement('li');
             newLapTime = time-newLapTime;
             lapTime.appendChild(lapEl);
-            lapTime.innerHTML = `${lap}: ${newLapTime}`;
+            lapTime.innerHTML = `${lap}: ${newLapTime/1000}`;
             carDistance = 0;
             lap++;
         }
@@ -327,7 +328,7 @@ function loop() {
         //--------------------------//
 
         hudEl.innerHTML = `Lap: ${lap} \
-        Time: ${seconds} sec
+        Time: ${Math.round(seconds)} sec
         Speed: ${Math.round(speed)} mph`
         //end loop
         //loop();

@@ -340,7 +340,10 @@ function loop() {
         ctx.putImageData(imageData, 0, 0);
         //-------Draw CPUs---------//
         CPUd +=CPUspeed;
-        (CPUspeed<160) ? CPUspeed+=.40 : CPUspeed = 160;
+        let maxSpd = 160;
+        if (CPUd<carDistance) maxSpd = 290;
+        (CPUspeed<maxSpd) ? CPUspeed+=.40 : CPUspeed = 160;
+        
         const scale = CPUy/h
         if (CPUy > 52 && CPUy<h-3) ctx.drawImage(CPUImage, CPUp-17, CPUy - 24*scale, 36*scale, 24*scale); 
         //--------------------------//

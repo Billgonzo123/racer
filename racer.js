@@ -52,7 +52,7 @@ let acc = 0;
 let CPUy = 0;
 let CPUx = -20; //Between -50 and 50. 0 is center track
 let CPUp = 0; //CPU H-Position
-let CPUd = 1100; //cpu distance
+let CPUd = 1500; //cpu distance
 let CPUspeed = 1;
 
 const rightImg = new Image();
@@ -342,9 +342,9 @@ function loop() {
         if (CPUd >= trackLength) CPUd = 0;
         CPUd +=CPUspeed;
         let maxSpd = 160;
-        if (CPUd<carDistance) maxSpd = 290;
+        if (CPUd<carDistance) maxSpd = speed+10;
+        if (maxSpd<160) maxSpd = 160;
         (CPUspeed<maxSpd) ? CPUspeed+=.40 : CPUspeed = 160;
-        
         const scale = CPUy/h
         if (CPUy > 52 && CPUy<h-3) ctx.drawImage(CPUImage, CPUp-17, CPUy - 24*scale, 36*scale, 24*scale); 
         //--------------------------//
@@ -377,6 +377,7 @@ function loop() {
 
 /////////////Key inputs///////////////////
 const logKeyDown = (e) => {
+    
     audioCtx.resume();//must resume audio context with user input
     if (!keysPressed.includes(e.key)) keysPressed = [...keysPressed, e.key.toLowerCase()];
     //console.log(keysPressed)

@@ -339,6 +339,7 @@ function loop() {
         //--------------------------//
         ctx.putImageData(imageData, 0, 0);
         //-------Draw CPUs---------//
+        if (CPUd >= trackLength) CPUd = 0;
         CPUd +=CPUspeed;
         let maxSpd = 160;
         if (CPUd<carDistance) maxSpd = 290;

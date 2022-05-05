@@ -55,6 +55,7 @@ let CPUx = -20; //Between -50 and 50. 0 is center track
 let CPUp = 0; //CPU H-Position
 let CPUd = 1500; //cpu distance
 let CPUspeed = 1;
+let CPUlap = 0;
 
 const rightImg = new Image();
 rightImg.src = './img/right.png';
@@ -343,7 +344,7 @@ function loop() {
         if (CPUd >= trackLength) CPUd = 0;
         CPUd +=CPUspeed;
         let maxSpd = 160;
-        if (CPUd<carDistance) {
+        if (CPUd+(CPUlap*trackLength)<carDistance*(lap*trackLength)) {
              position = 1;
             maxSpd = speed+10;
         }else {

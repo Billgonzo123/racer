@@ -214,7 +214,7 @@ function loop() {
             newLapTime = seconds-lapAcc;
             lapAcc += newLapTime;
             lapEl.appendChild(lapTime);
-            lapTime.textContent = `Lap ${lap}: ${newLapTime}s`;
+            lapTime.textContent = `Lap ${lap}: ${Math.round(1000*newLapTime)/1000 }s`;
             carDistance = 0;
             lap++;
         }

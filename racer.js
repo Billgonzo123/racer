@@ -49,8 +49,11 @@ let carY = 0;
 let carD = 0; //direction -1 0 1
 let acc = 0;
 
-CPUy = 0;
-CPUx = 50;
+let CPUy = 0;
+let CPUx = -20; //Between -50 and 50. 0 is center track
+let CPUp = 0; //CPU H-Position
+let CPUd = 1100; //cpu distance
+let CPUspeed = 1;
 
 const rightImg = new Image();
 rightImg.src = './img/right.png';
@@ -58,6 +61,8 @@ const leftImg = new Image();
 leftImg.src = './img/left.png';
 const upImage = new Image();
 upImage.src = './img/up.png';
+const CPUImage = new Image();
+CPUImage.src = './img/CPU_1.png';
 
 let img = upImage;
 const myFont = new FontFace('myFont', 'url(./tiny.ttf)');
@@ -258,7 +263,7 @@ function loop() {
             //create a color variable
             let color = [255, 0, 0];
             const startLine = Math.pow(1 - perspective, 2) + ((trackLength - carDistance) * .02);
-            const CPU = Math.pow(1 - perspective, 2) + ((10000 - carDistance) * .02)//this is how we make CPU players appear  
+            const CPU = Math.pow(1 - perspective, 2) + ((CPUd - carDistance) * .02)//this is how we make CPU players appear  
             //get half of road width. makes calculations easier for symetrical track
             roadWidth *= 0.5;
             const leftGrass = (midPoint - roadWidth - clipWidth) * w;
@@ -313,13 +318,13 @@ function loop() {
                 if (x >= leftGrass && x < leftClip) color = clipColor;
                 if (x >= rightClip && x < rightGrass) color = clipColor;
                 if (x >= rightGrass && x < w) color = grassColor;
-                
+
                 //--------CPUs-----------//
                 if (y === Math.round(100 - CPU + (20 * perspective))) 
                 {
                     CPUy = y;
-                    CPUx = CPUx-(perspective/y)
-                }
+                    CPUp = ((midPoint*w)) + (perspective*CPUx)
+                } 
         
                 //--------Set Pixel Data---------//
                 imageData.data[pixelindex] = color[0]      // Red
@@ -333,14 +338,17 @@ function loop() {
         //   Render Entire Image    //
         //--------------------------//
         ctx.putImageData(imageData, 0, 0);
-        //
+        //-------Draw CPUs---------//
+        CPUd +=CPUspeed;
+        (CPUspeed<130) ? CPUspeed+=.20 : CPUspeed = 130;
+        const scale = CPUy/h
+        if (CPUy > 52 && CPUy<h-3) ctx.drawImage(CPUImage, CPUp-17, CPUy - 24*scale, 36*scale, 24*scale); 
         //--------------------------//
         //        Draw Car          //
         //--------------------------//
         carX = Math.round(carX);
         carY = Math.round(carY);
         ctx.drawImage(img, carX, carY - 12)
-        ctx.drawImage(img, CPUx, CPUy - 12)
         //--------------------------//
         //        Draw Hud          //
         //--------------------------//

@@ -362,7 +362,7 @@ function loop() {
         //-------------------------//
         //----Calculate CPU scale and speed-------//
         //------------------------//
-        if (CPUd >= trackLength) CPUd = 1590;
+        if (CPUd >= trackLength) CPUd = 0;
         CPUd += Math.round(1000*CPUspeed)/1000; //Add current track distance
         CPUtd += Math.round(1000*CPUspeed)/1000; //add to total distance CPU
         let newMax = maxSpd;

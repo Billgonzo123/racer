@@ -54,9 +54,11 @@ let acc = 0;
 let CPUy = 0;
 let CPUx = -20; //Between -50 and 50. 0 is center track
 let CPUp = 0; //CPU H-Position
+let CPUcurve = CPUx/35
 let CPUd = 0; //cpu distance
-let CPUtd = -1300; //CPU totalDistance-must have this offset for some reason
+let CPUtd = -1730; //CPU totalDistance-must have this offset for some reason
 let CPUspeed = 1;
+let maxSpd = 160;
 let CPUlap = 0;
 
 const rightImg = new Image();
@@ -83,7 +85,7 @@ let initTime = Date.now();
 var frame = 0;
 // set track sections [curvatrue, dist]
 const trackArray = [
-    [0, 30000],
+    [1, 5000],
     [1, 20000],
     [0, 20000],
     [-1, 20000],
@@ -216,7 +218,7 @@ function loop() {
         carDistance += speed;
         totalDistance += speed;
         //-----------------------------------------//
-        //keep track of where we are on the track
+        //keep track of the section of track we are on
         //----------------------------------------//
         let offSet = 0;
         let trackSection = 0;
@@ -226,6 +228,7 @@ function loop() {
             offSet += trackArray[trackSection][1];
             trackSection++;
         }
+        //if you cross the finish line
         if (trackSection === trackArray.length && carDistance > offSet) {
             const lapTime = document.createElement('li');
             newLapTime = seconds - lapAcc;
@@ -324,12 +327,25 @@ function loop() {
                 if (x >= rightClip && x < rightGrass) color = clipColor;
                 if (x >= rightGrass && x < w) color = grassColor;
 
-                //--------CPUs-----------//
-                if (y === Math.round(100 - CPU + (20 * perspective))) 
-                {
+                //--------CPU x,y coord-----------//
+                if (y === Math.round(100 - CPU + (20 * perspective))) {
                     CPUy = y;
-                    CPUp = ((midPoint*w)) + (perspective*CPUx)
-                } 
+                    
+                    let scale = Math.pow(CPUy, 2 + (CPUy / 70)) / 1000000;
+
+                    if (CPUy>80) {
+                        //CPUp -= CPUx*((y-80))
+                        CPUp = w/2;
+
+                    } else {
+                        
+                        CPUp =((w)/2)+(((currentCurve) * (w)))-(scale*currentCurve*w)
+                    }
+                    
+                    
+                    
+                    
+                }
         
                 //--------Set Pixel Data---------//
                 imageData.data[pixelindex] = color[0]      // Red
@@ -338,36 +354,62 @@ function loop() {
                 imageData.data[pixelindex + 3] = 255;   // Alpha
 
             }
+            
         }
+        
         //--------------------------//
         //   Render Entire Image    //
         //--------------------------//
         ctx.putImageData(imageData, 0, 0);
-        //-------Draw CPUs---------//
-        if (CPUd >= trackLength) CPUd = 0;
-        CPUd +=CPUspeed; //Add current track distance
-        CPUtd +=CPUspeed; //add to total distance CPU
-        let maxSpd = 160;
-        if (CPUtd<totalDistance) {
-             position = 1;
-            maxSpd = speed+10;
-             
-        }else {
-             position = 2;
-             if (CPUtd-totalDistance < 3000) maxSpd = speed*1.5-y
+        //-------------------------//
+        //----Calculate CPU scale and speed-------//
+        //------------------------//
+        if (CPUd >= trackLength) CPUd = -1730;
+        CPUd += CPUspeed; //Add current track distance
+        CPUtd += CPUspeed; //add to total distance CPU
+        let newMax = speed-5;
+        if (CPUtd < totalDistance) {
+            position = 1;
+            newMax = speed+10;
+        } else {
+            position = 2;
+            if (CPUspeed> newMax) CPUspeed-=.2
+            
         }
-        console.log(CPUtd-totalDistance )
-        if (maxSpd<160) maxSpd = 160; //never lex max speed below 160mph
+
+        if(newMax<maxSpd) newMax = maxSpd;
+        if(newMax>208) newMax = 208;
+        newMax -= currentCurve*100
+        if (CPUspeed < newMax) CPUspeed += .3;
         
-        (CPUspeed<maxSpd) ? CPUspeed+=.40 : CPUspeed = 160;
-        const scale = CPUy/h
-        if (CPUy > 52 && CPUy<h-3) ctx.drawImage(CPUImage, CPUp-17, CPUy - 24*scale, 36*scale, 24*scale); 
+        const scale = Math.pow(CPUy, 2 + (CPUy / 70)) / 1000000
+
+        console.log(CPUtd-totalDistance, newMax)
+
         //--------------------------//
-        //        Draw Car          //
+        //   Calculate Car Pos      //
         //--------------------------//
         carX = Math.round(carX);
         carY = Math.round(carY);
-        ctx.drawImage(img, carX, carY - 12)
+
+        //--------------------------//
+        //--Car & CPU Render functions--//
+        CPUx = Math.round(CPUx);
+        const renderPlyr = () => ctx.drawImage(img, carX, carY - 12)
+        const renderCPU = () => { if (CPUy > 60 && CPUy < h-2) ctx.drawImage(CPUImage, CPUp+(-17+CPUx)*scale, CPUy - 12, 36 * scale, 24 * scale); }
+     
+        //-- which to render first--//
+        if (CPUy< 80) {
+            renderCPU();
+            renderPlyr();
+        } else {
+        
+            renderPlyr();
+            renderCPU();
+        }
+
+      
+     
         //--------------------------//
         //        Draw Hud          //
         //--------------------------//
@@ -375,7 +417,7 @@ function loop() {
         hudEl.innerHTML = `Lap: ${lap} 
         Time: ${Math.round(seconds)} sec
         Speed: ${Math.round(speed)} mph
-        Pos: ${position}${(position===1)? "st" : "nd"}`
+        Pos: ${position}${(position === 1) ? "st" : "nd"}`
         //end loop
         //loop();
         //window.requestAnimationFrame(loop);
@@ -393,7 +435,7 @@ function loop() {
 
 /////////////Key inputs///////////////////
 const logKeyDown = (e) => {
-    
+
     audioCtx.resume();//must resume audio context with user input
     if (!keysPressed.includes(e.key)) keysPressed = [...keysPressed, e.key.toLowerCase()];
     //console.log(keysPressed)

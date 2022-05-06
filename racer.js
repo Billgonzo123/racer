@@ -333,7 +333,7 @@ function loop() {
                     
                     let scale = Math.pow(CPUy, 2 + (CPUy / 70)) / 1000000;
 
-                    if (CPUy>80) {
+                    if (CPUy>=80) {
                         //CPUp -= CPUx*((y-80))
                         CPUp = w/2;
 
@@ -373,18 +373,18 @@ function loop() {
             newMax = speed+10;
         } else {
             position = 2;
-            if (CPUspeed> newMax) CPUspeed-=.2
+            if (CPUspeed> newMax) CPUspeed-=.4
             
         }
-
+        newMax -= Math.abs(currentCurve*90)
+        if (CPUtd-totalDistance>20000 ) CPUspeed = 0;
         if(newMax<maxSpd) newMax = maxSpd;
-        if(newMax>208) newMax = 208;
-        newMax -= currentCurve*100
-        if (CPUspeed < newMax) CPUspeed += .3;
+        
+        if (CPUspeed < newMax) CPUspeed += .40;
         
         const scale = Math.pow(CPUy, 2 + (CPUy / 70)) / 1000000
 
-        console.log(CPUtd-totalDistance, newMax)
+        console.log(CPUtd-totalDistance, CPUspeed)
 
         //--------------------------//
         //   Calculate Car Pos      //

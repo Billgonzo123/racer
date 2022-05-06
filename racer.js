@@ -43,7 +43,7 @@ let speed = 0;
 let currentCurve = 0;
 let trackCurve = 0;
 let targetCurve = 0;
-let playerCurve = 0;
+let playerCurve =.2;
 let lap = 1;
 let position = 2;
 let carX = 0;
@@ -55,8 +55,8 @@ let CPUy = 0;
 let CPUx = -20; //Between -50 and 50. 0 is center track
 let CPUp = 0; //CPU H-Position
 let CPUcurve = CPUx/35
-let CPUd = 0; //cpu distance
-let CPUtd = -1730; //CPU totalDistance-must have this offset for some reason
+let CPUd = 1590; //cpu distance -must have this offset for some reason
+let CPUtd = 0; //CPU
 let CPUspeed = 1;
 let maxSpd = 160;
 let CPUlap = 0;
@@ -85,7 +85,7 @@ let initTime = Date.now();
 var frame = 0;
 // set track sections [curvatrue, dist]
 const trackArray = [
-    [1, 5000],
+    [1, 10],
     [1, 20000],
     [0, 20000],
     [-1, 20000],
@@ -330,9 +330,7 @@ function loop() {
                 //--------CPU x,y coord-----------//
                 if (y === Math.round(100 - CPU + (20 * perspective))) {
                     CPUy = y;
-                    
                     let scale = Math.pow(CPUy, 2 + (CPUy / 70)) / 1000000;
-
                     if (CPUy>=80) {
                         //CPUp -= CPUx*((y-80))
                         CPUp = w/2;
@@ -364,23 +362,22 @@ function loop() {
         //-------------------------//
         //----Calculate CPU scale and speed-------//
         //------------------------//
-        if (CPUd >= trackLength) CPUd = -1730;
-        CPUd += CPUspeed; //Add current track distance
-        CPUtd += CPUspeed; //add to total distance CPU
-        let newMax = speed-5;
+        if (CPUd >= trackLength) CPUd = 1590;
+        CPUd += Math.round(1000*CPUspeed)/1000; //Add current track distance
+        CPUtd += Math.round(1000*CPUspeed)/1000; //add to total distance CPU
+        let newMax = maxSpd;
         if (CPUtd < totalDistance) {
             position = 1;
-            newMax = speed+10;
+            newMax = 225;
         } else {
             position = 2;
             if (CPUspeed> newMax) CPUspeed-=.4
-            
         }
         newMax -= Math.abs(currentCurve*90)
-        if (CPUtd-totalDistance>20000 ) CPUspeed = 0;
+        if (CPUtd-totalDistance>25000 ) CPUspeed = -.4;
         if(newMax<maxSpd) newMax = maxSpd;
         
-        if (CPUspeed < newMax) CPUspeed += .40;
+        if (CPUspeed < newMax) CPUspeed += .4
         
         const scale = Math.pow(CPUy, 2 + (CPUy / 70)) / 1000000
 

@@ -38,6 +38,7 @@ let lapAcc = 0;
 //---------Game Vars--------//
 let keysPressed = [];
 let carDistance = 0;
+let totalDistance = 0;
 let speed = 0;
 let currentCurve = 0;
 let trackCurve = 0;
@@ -53,7 +54,8 @@ let acc = 0;
 let CPUy = 0;
 let CPUx = -20; //Between -50 and 50. 0 is center track
 let CPUp = 0; //CPU H-Position
-let CPUd = 1500; //cpu distance
+let CPUd = 0; //cpu distance
+let CPUtd = -1300; //CPU totalDistance-must have this offset for some reason
 let CPUspeed = 1;
 let CPUlap = 0;
 
@@ -212,6 +214,7 @@ function loop() {
 
         //keep track of how far car has traveled
         carDistance += speed;
+        totalDistance += speed;
         //-----------------------------------------//
         //keep track of where we are on the track
         //----------------------------------------//
@@ -342,15 +345,20 @@ function loop() {
         ctx.putImageData(imageData, 0, 0);
         //-------Draw CPUs---------//
         if (CPUd >= trackLength) CPUd = 0;
-        CPUd +=CPUspeed;
+        CPUd +=CPUspeed; //Add current track distance
+        CPUtd +=CPUspeed; //add to total distance CPU
         let maxSpd = 160;
-        if (CPUd+(CPUlap*trackLength)<carDistance*(lap*trackLength)) {
+        if (CPUtd<totalDistance) {
              position = 1;
             maxSpd = speed+10;
+             
         }else {
              position = 2;
+             if (CPUtd-totalDistance < 3000) maxSpd = speed*1.5-y
         }
-        if (maxSpd<160) maxSpd = 160;
+        console.log(CPUtd-totalDistance )
+        if (maxSpd<160) maxSpd = 160; //never lex max speed below 160mph
+        
         (CPUspeed<maxSpd) ? CPUspeed+=.40 : CPUspeed = 160;
         const scale = CPUy/h
         if (CPUy > 52 && CPUy<h-3) ctx.drawImage(CPUImage, CPUp-17, CPUy - 24*scale, 36*scale, 24*scale); 

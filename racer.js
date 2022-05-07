@@ -316,6 +316,18 @@ function loop() {
             const rightGrass = (midPoint + roadWidth + clipWidth) * w;
             const rightClip = (midPoint + roadWidth) * w;
 
+            //--------CPU x,y coord-----------//
+            if (y === Math.round(100 - CPU + (20 * perspective))) {
+                CPUy = y;
+                if (CPUy >= 80) {
+                    //CPUp -= CPUx*((y-80)
+                    CPUp = w / 2;
+                } else {
+                    CPUp = ((w) / 2) + (((currentCurve) * (w))) - (scale * currentCurve * w)
+                }
+
+            }
+
             for (let x = 0; x < w; x++) {
                 //--------------------------//
                 ///Draw  Top (hills and sky)//
@@ -363,18 +375,6 @@ function loop() {
                 if (x >= leftGrass && x < leftClip) color = clipColor;
                 if (x >= rightClip && x < rightGrass) color = clipColor;
                 if (x >= rightGrass && x < w) color = grassColor;
-
-                //--------CPU x,y coord-----------//
-                if (y === Math.round(100 - CPU + (20 * perspective))) {
-                    CPUy = y;
-                    if (CPUy >= 80) {
-                        //CPUp -= CPUx*((y-80))
-                        CPUp = w / 2;
-                    } else {
-                        CPUp = ((w) / 2) + (((currentCurve) * (w))) - (scale * currentCurve * w)
-                    }
-
-                }
 
                 //--------Set Pixel Data---------//
                 imageData.data[pixelindex] = color[0]      // Red
@@ -457,12 +457,12 @@ function loop() {
             renderCPU();
         }
         ctx.fillStyle = '#00000055';
-        ctx.fillRect(0,1,160,2)
-        ctx.fillRect(0,4,160,2)
+        ctx.fillRect(0, 1, 160, 2)
+        ctx.fillRect(0, 4, 160, 2)
         ctx.fillStyle = "blue";
-        ctx.fillRect(Math.round((carDistance/trackLength)*160),1,4,2)
+        ctx.fillRect(Math.round((carDistance / trackLength) * 160), 1, 4, 2)
         ctx.fillStyle = "red";
-        ctx.fillRect(Math.round(((CPUd-1590)/trackLength)*160),4,4,2)
+        ctx.fillRect(Math.round(((CPUd - 1590) / trackLength) * 160), 4, 4, 2)
 
         //--------------------------//
         //        Draw Hud          //
@@ -481,7 +481,7 @@ function loop() {
         const tireFeq = (Math.floor(carDistance) % 2)
         tireSnd.frequency.setValueAtTime(920 + (50 * tireFeq), audioCtx.currentTime)
 
-    }, 16.667)
+    }, 1000/60)
 
 }
 

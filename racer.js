@@ -402,7 +402,7 @@ function loop() {
 
         switch (true) {
             case (CPUspeed < 45):
-                CPUacc = .45;
+                CPUacc = .41;
                 break;
             case (CPUspeed >= 45 && CPUspeed < 80):
                 CPUacc = .355;

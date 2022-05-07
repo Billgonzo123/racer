@@ -84,6 +84,8 @@ let dk = 0; //day\night effect
 var startTime = Date.now();
 let initTime = Date.now();
 var frame = 0;
+
+let hillArray = [];
 // set track sections [curvatrue, dist]
 const trackArray = [
     [0, 30000],
@@ -111,6 +113,13 @@ function run() {
         w = canvas.width;
         h = canvas.height;
         mid = h / 2;
+        //preCalculate hills
+        for (let i = 0; i <= 2000; i++) {
+            const hillX = Math.floor(Math.abs(Math.sin( i * 0.01 + trackCurve) * 16.0));
+         hillArray.push(hillX)
+            
+        }
+        console.log(hillArray)
         imageData = ctx.createImageData(w, h)
         window.requestAnimationFrame(loop)
     }
@@ -125,8 +134,8 @@ function loop() {
         frame++;
         //frame rate counter and timer
         if (time - startTime > 1000) {
-            //console.clear();
-            //console.log('FPS:', (frame / ((time - startTime) / 1000)).toFixed(1));
+           // console.clear();
+           // console.log('FPS:', (frame / ((time - startTime) / 1000)).toFixed(1));
             startTime = time;
             frame = 0;
         }
@@ -179,10 +188,11 @@ function loop() {
         }
         //init car direction
         carD = 0;
+        const c = Math.abs(targetCurve - currentCurve);
         if (keysPressed.includes('arrowleft') && speed > 0) {
             carD = -1;
             playerCurve -= (.015);
-            if (Math.abs(targetCurve - currentCurve) > .2 && speed > 160) tireGain.gain.value = .3;
+            if (c > .2 && speed > 160) tireGain.gain.value = .3;
         } else {
             if (!keysPressed.includes('arrowright') && !keysPressed.includes('x')) {
                 tireGain.gain.value = 0;
@@ -192,14 +202,14 @@ function loop() {
         if (keysPressed.includes('arrowright') && speed > 0) {
             carD = 1;
             playerCurve += (.015);
-            if (Math.abs(targetCurve - currentCurve) > .2 && speed > 160) tireGain.gain.value = .3;
+            if (c > .2 && speed > 160) tireGain.gain.value = .3;
         } else {
             if (!keysPressed.includes('arrowleft') && !keysPressed.includes('x')) {
                 tireGain.gain.value = 0;
             }
         }
 
-        if (Math.abs(targetCurve - currentCurve) < .2 || speed <= 160) {
+        if (c < .2 || speed <= 160) {
             if (!keysPressed.includes('x') || speed < 50) tireGain.gain.value = 0;
         }
 
@@ -244,7 +254,7 @@ function loop() {
         }
         //find the target track curve for CPU after fi
         let CPUtargetCurve = trackArray[CPUtrackSection - 1][0];
-        if (CPUspeed>160) CPUspeed -= Math.abs(CPUtargetCurve/3);//slow CPU down on curvs
+        if (CPUspeed > 160) CPUspeed -= Math.abs(CPUtargetCurve / 3);//slow CPU down on curvs
 
 
         //if you cross the finish line
@@ -280,6 +290,7 @@ function loop() {
         //--------------------------//
         for (y = mid; y < h; y++) {
 
+
             // make track calculations
             dk = (seconds < 160) ? seconds : 160;//to darken color over time
             const gY = y * 2;//to create a gradient color
@@ -289,22 +300,27 @@ function loop() {
             let roadWidth = 0.1 + perspective * 0.8;
             const clipWidth = roadWidth * 0.15;
 
+            const perspectivePow = Math.pow(1 - perspective, 2);
+            const grassSpace = Math.sin(20 * perspectivePow + carDistance * .008)
+
+            const clipSpace = Math.sin(40 * perspectivePow + carDistance * .02);
+
             //create a color variable
             let color = [255, 0, 0];
-            const startLine = Math.pow(1 - perspective, 2) + ((trackLength - carDistance) * .02);
-            const CPU = Math.pow(1 - perspective, 2) + ((CPUd - carDistance) * .02)//this is how we make CPU players appear  
+            const startLine = perspectivePow + ((trackLength - carDistance) * .02);
+            const CPU = perspectivePow + ((CPUd - carDistance) * .02)//this is how we make CPU players appear  
             //get half of road width. makes calculations easier for symetrical track
             roadWidth *= 0.5;
             const leftGrass = (midPoint - roadWidth - clipWidth) * w;
             const leftClip = (midPoint - roadWidth) * w;
             const rightGrass = (midPoint + roadWidth + clipWidth) * w;
             const rightClip = (midPoint + roadWidth) * w;
-
+           
             for (let x = 0; x < w; x++) {
                 //--------------------------//
                 ///Draw  Top (hills and sky)//
                 //--------------------------//
-                const hillHeight = Math.floor(Math.abs(Math.sin(x * 0.01 + trackCurve) * 16.0));
+                hillHeight = hillArray[200+Math.round(x+100*trackCurve)]
                 const pixelindexTop = (((y - (mid)) * w + x) * 4);//Find RGBA pixel index for imageData
                 let colorB = (y > (h) - hillHeight) ? [55 - y * perspective - (dk / 5), 155 - y * perspective - (dk / 5), 55 - y * perspective - (dk / 10)] : [100 + (y * 2) - dk, 100 - dk, 255 - dk];
                 //hill border color
@@ -330,11 +346,11 @@ function loop() {
                 const l = (dk > 60 && y < carY + 3 && 31 - (Math.abs(carD)) > circleBound) ? dk : 0;
 
                 // Grass color
-                const grassColor = (Math.sin(20 * Math.pow(1 - perspective, 3) + carDistance * .008) > 0) ?
+                const grassColor = (grassSpace > 0) ?
                     [0, 10 + gY - dk + l, 0] : [0, 50 + gY - dk + l, 0];
 
                 // clip color
-                const clipColor = (Math.sin(40 * Math.pow(1 - perspective, 2) + carDistance * .02) > 0) ?
+                const clipColor = (clipSpace > 0) ?
                     [80 + gY - dk + l, 0, 0] : [80 + gY - dk + l, 80 + gY - dk + l, 80 + gY - dk + l];
 
                 //----Road Color----//
@@ -361,9 +377,6 @@ function loop() {
                         CPUp = ((w) / 2) + (((currentCurve) * (w))) - (scale * currentCurve * w)
                     }
 
-
-
-
                 }
 
                 //--------Set Pixel Data---------//
@@ -384,20 +397,14 @@ function loop() {
         //----Calculate CPU scale and speed-------//
         //------------------------//
         if (CPUd >= trackLength) CPUd = 0;
-        CPUd += Math.round(1000 * CPUspeed) / 1000; //Add current track distance
-        CPUtd += Math.round(1000 * CPUspeed) / 1000; //add to total distance CPU
-        let newMax = maxSpd;
+        const addSpd = Math.round(1000 * CPUspeed) / 1000;
+        CPUd += addSpd; //Add current track distance
+        CPUtd += addSpd; //add to total distance CPU
         if (CPUtd < totalDistance) {
             position = 1;
         } else {
             position = 2;
-            //if (CPUspeed> newMax) CPUspeed-=.4
         }
-        //newMax -= Math.abs(currentCurve*90)
-        //if (CPUtd-totalDistance>25000 ) CPUspeed = 0;
-        //if(newMax<maxSpd) newMax = maxSpd;
-
-        //if (CPUspeed < newMax) CPUspeed += .4
 
 
         switch (true) {
@@ -431,7 +438,7 @@ function loop() {
 
         //CPUspeed += CPUacc-Math.abs(currentCurve/1000);
         const scale = Math.pow(CPUy, 2 + (CPUy / 70)) / 1000000
-        
+
 
         //--------------------------//
         //   Calculate Car Pos      //
@@ -454,14 +461,14 @@ function loop() {
             renderPlyr();
             renderCPU();
         }
-        ctx.fillStyle = '#00000055';
-        ctx.fillRect(0,1,160,2)
-        ctx.fillRect(0,4,160,2)
-        ctx.fillStyle = "blue";
-        ctx.fillRect(Math.round((carDistance/trackLength)*160),1,4,2)
-        ctx.fillStyle = "red";
-        ctx.fillRect(Math.round(((CPUd-1590)/trackLength)*160),4,4,2)
-        
+        // ctx.fillStyle = '#00000055';
+        // ctx.fillRect(0,1,160,2)
+        // ctx.fillRect(0,4,160,2)
+        // ctx.fillStyle = "blue";
+        // ctx.fillRect(Math.round((carDistance/trackLength)*160),1,4,2)
+        // ctx.fillStyle = "red";
+        // ctx.fillRect(Math.round(((CPUd-1590)/trackLength)*160),4,4,2)
+
 
 
 

@@ -9,6 +9,8 @@ catch (e) {
     alert('Web Audio API is not supported in this browser');
 }
 
+const worker = new Worker("worker.js");; //webworker
+
 
 // create Oscillator(s) node
 // Engine 
@@ -130,6 +132,7 @@ function run() {
 
 function loop() {
     setInterval(() => {
+      
         //console.log(keysPressed)
         let carPosH = (playerCurve - trackCurve);
         var time = Date.now();
@@ -288,6 +291,7 @@ function loop() {
         carX = (w / 2) + ((w * carPosH) / 2) - carM;
         carY = h - 20;
 
+        worker.postMessage({imageData, w, h, mid,  seconds,  currentCurve,  carDistance, trackLength, CPUd, carD,carX, carY, carW, carM, scale});
 
         //--------------------------//
         //      Begin Draw          //
@@ -345,49 +349,26 @@ function loop() {
                 imageData.data[pixelindexTop + 2] = colorB[2];  // Blue
                 imageData.data[pixelindexTop + 3] = 255;   // Alpha
 
-
-                //--------------------------//
-                //       Draw Bottom        //
-                //--------------------------//
-                const pixelindex = (y * w + x) * 4; //find RGBA pixel index for imageData
-
-                //create head lights
-                let circleBound = Math.sqrt(Math.pow(x - (carX + (carD * 11) + carM - 1), 2) + Math.pow(y - carY, 2));
-                if (y > carY - 6 + (Math.abs(carD) * 4)) circleBound = circleBound * perspective + 15.5 - (Math.abs(carD * 3));
-
-                const l = (dk > 60 && y < carY + 3 && 31 - (Math.abs(carD)) > circleBound) ? dk : 0;
-
-                // Grass color
-                const grassColor = (grassSpace > 0) ?
-                    [0, 10 + gY - dk + l, 0] : [0, 50 + gY - dk + l, 0];
-
-                // clip color
-                const clipColor = (clipSpace > 0) ?
-                    [80 + gY - dk + l, 0, 0] : [80 + gY - dk + l, 80 + gY - dk + l, 80 + gY - dk + l];
-
-                //----Road Color----//
-                if (x >= leftClip && x < rightClip) color = (y < 100 - startLine + (20 * perspective) && y > 100 - startLine)
-                    ? [255, 255, 255] : [(gY - dk + l), (gY - dk + l), (gY - dk + l)];
-
-                //----Determine if pixel is not road----//
-                //----Set color based on this data-----//
-                if (x >= 0 && x < leftGrass) color = grassColor;
-                if (x >= leftGrass && x < leftClip) color = clipColor;
-                if (x >= rightClip && x < rightGrass) color = clipColor;
-                if (x >= rightGrass && x < w) color = grassColor;
-
-                //--------Set Pixel Data---------//
-                imageData.data[pixelindex] = color[0]      // Red
-                imageData.data[pixelindex + 1] = color[1]  // Green
-                imageData.data[pixelindex + 2] = color[2]   // Blue
-                imageData.data[pixelindex + 3] = 255;   // Alpha
             }
         }
 
         //--------------------------//
         //   Render Entire Image    //
         //--------------------------//
-        ctx.putImageData(imageData, 0, 0);
+        
+        worker.onmessage = function(event){
+         
+            const half = Math.ceil(imageData.data.length / 2);
+            const top = Array.from(imageData.data);
+            const bottom = Array.from(event.data)
+            const firstHalf = top.splice(0, half)
+            const secondHalf = bottom.splice(-half)
+            const newImage = new Uint8ClampedArray( [...firstHalf, ...secondHalf]);
+         
+            imageData.data.set(newImage)
+            ctx.putImageData(imageData, 0, 0);
+       
+       
         //-------------------------//
         //----Calculate CPU scale and speed-------//
         //------------------------//
@@ -480,6 +461,7 @@ function loop() {
         engSnd.frequency.setValueAtTime(speed * (3 * gear), audioCtx.currentTime); // value in hertz
         const tireFeq = (Math.floor(carDistance) % 2)
         tireSnd.frequency.setValueAtTime(920 + (50 * tireFeq), audioCtx.currentTime)
+    };
 
     }, 1000/60)
 

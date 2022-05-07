@@ -89,6 +89,7 @@ let dk = 0; //day\night effect
 var startTime = Date.now();
 let initTime = Date.now();
 var frame = 0;
+let topHalf = [];
 
 let hillArray = [];
 // set track sections [curvatrue, dist]
@@ -126,6 +127,7 @@ function run() {
         }
 
         imageData = ctx.createImageData(w, h)
+        topHalf = Array.from(imageData.data);
         window.requestAnimationFrame(loop)
     }
 }
@@ -308,17 +310,11 @@ function loop() {
             const clipWidth = roadWidth * 0.15;
 
             const perspectivePow = Math.pow(1 - perspective, 2);
-            const grassSpace = Math.sin(20 * perspectivePow + carDistance * .008)
-            const clipSpace = Math.sin(40 * perspectivePow + carDistance * .02);
-
-            const startLine = perspectivePow + ((trackLength - carDistance) * .02);
+           
             const CPU = perspectivePow + ((CPUd - carDistance) * .02)//this is how we make CPU players appear  
             //get half of road width. makes calculations easier for symetrical track
             roadWidth *= 0.5;
-            const leftGrass = (midPoint - roadWidth - clipWidth) * w;
-            const leftClip = (midPoint - roadWidth) * w;
-            const rightGrass = (midPoint + roadWidth + clipWidth) * w;
-            const rightClip = (midPoint + roadWidth) * w;
+
 
             //--------CPU x,y coord-----------//
             if (y === Math.round(100 - CPU + (20 * perspective))) {
@@ -344,10 +340,10 @@ function loop() {
                     [245 - dk / 1.6, 130 - dk, 230 - dk / 1.3];
                 //[-80 + gY*2 * perspective + dk / 4,  -50 + gY * perspective - dk / 6, -80 + gY*2 * perspective + dk / 4];
                 //-------Set Pixel Data-------//
-                imageData.data[pixelindexTop] = colorB[0];     // Red
-                imageData.data[pixelindexTop + 1] = colorB[1]; // Green
-                imageData.data[pixelindexTop + 2] = colorB[2];  // Blue
-                imageData.data[pixelindexTop + 3] = 255;   // Alpha
+                topHalf[pixelindexTop] = colorB[0];     // Red
+                topHalf[pixelindexTop + 1] = colorB[1]; // Green
+                topHalf[pixelindexTop + 2] = colorB[2];  // Blue
+                topHalf[pixelindexTop + 3] = 255;   // Alpha
 
             }
         }
@@ -355,17 +351,19 @@ function loop() {
         //--------------------------//
         //   Render Entire Image    //
         //--------------------------//
-        
+       
         worker.onmessage = function(event){
          
-            const half = Math.ceil(imageData.data.length / 2);
-            const top = Array.from(imageData.data);
-            const bottom = Array.from(event.data)
-            const firstHalf = top.splice(0, half)
-            const secondHalf = bottom.splice(-half)
+            const half = 32000;
+            
+            
+            const firstHalf = topHalf.splice(0, half);
+            const secondHalf = event.data;
+
             const newImage = new Uint8ClampedArray( [...firstHalf, ...secondHalf]);
          
-            imageData.data.set(newImage)
+            imageData.data.set(newImage);
+        
             ctx.putImageData(imageData, 0, 0);
        
        
@@ -461,7 +459,7 @@ function loop() {
         engSnd.frequency.setValueAtTime(speed * (3 * gear), audioCtx.currentTime); // value in hertz
         const tireFeq = (Math.floor(carDistance) % 2)
         tireSnd.frequency.setValueAtTime(920 + (50 * tireFeq), audioCtx.currentTime)
-    };
+        };
 
     }, 1000/60)
 

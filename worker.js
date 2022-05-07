@@ -70,6 +70,10 @@ self.onmessage = (message) => {
             imageData.data[pixelindex + 3] = 255;   // Alpha
         }
     }
-    postMessage(imageData.data)
+    //return the half of the screen that was renedered
+    const half = 32000;
+    const top = Array.from(imageData.data);
+    const bottomHalf = top.splice(-half)
+    postMessage(bottomHalf)
 }
 

@@ -50,6 +50,7 @@ let carX = 0;
 let carY = 0;
 let carD = 0; //direction -1 0 1
 let acc = 0;
+let scale = 0;
 
 let CPUy = 0;
 let CPUx = -20; //Between -50 and 50. 0 is center track
@@ -70,6 +71,8 @@ const upImage = new Image();
 upImage.src = './img/up.png';
 const CPUImage = new Image();
 CPUImage.src = './img/CPU_1.png';
+//create a color variable
+let color = [255, 0, 0];
 
 let img = upImage;
 const myFont = new FontFace('myFont', 'url(./tiny.ttf)');
@@ -114,12 +117,12 @@ function run() {
         h = canvas.height;
         mid = h / 2;
         //preCalculate hills
-        for (let i = 0; i <= 2000; i++) {
-            const hillX = Math.floor(Math.abs(Math.sin( i * 0.01 + trackCurve) * 16.0));
-         hillArray.push(hillX)
-            
+        for (let i = 0; i < 2000; i++) {
+            const hillX = Math.floor(Math.abs(Math.sin(i * 0.01 + trackCurve) * 16.0));
+            hillArray.push(hillX)
+
         }
-        console.log(hillArray)
+
         imageData = ctx.createImageData(w, h)
         window.requestAnimationFrame(loop)
     }
@@ -134,8 +137,8 @@ function loop() {
         frame++;
         //frame rate counter and timer
         if (time - startTime > 1000) {
-           // console.clear();
-           // console.log('FPS:', (frame / ((time - startTime) / 1000)).toFixed(1));
+            // console.clear();
+            // console.log('FPS:', (frame / ((time - startTime) / 1000)).toFixed(1));
             startTime = time;
             frame = 0;
         }
@@ -177,6 +180,7 @@ function loop() {
         } else {
             speed -= 0.1;
         }
+        //accelerate CPU and lower acc on curves
         CPUspeed += CPUacc - Math.abs(currentCurve / 10)
 
         if (keysPressed.includes('x')) {
@@ -290,7 +294,6 @@ function loop() {
         //--------------------------//
         for (y = mid; y < h; y++) {
 
-
             // make track calculations
             dk = (seconds < 160) ? seconds : 160;//to darken color over time
             const gY = y * 2;//to create a gradient color
@@ -302,11 +305,8 @@ function loop() {
 
             const perspectivePow = Math.pow(1 - perspective, 2);
             const grassSpace = Math.sin(20 * perspectivePow + carDistance * .008)
-
             const clipSpace = Math.sin(40 * perspectivePow + carDistance * .02);
 
-            //create a color variable
-            let color = [255, 0, 0];
             const startLine = perspectivePow + ((trackLength - carDistance) * .02);
             const CPU = perspectivePow + ((CPUd - carDistance) * .02)//this is how we make CPU players appear  
             //get half of road width. makes calculations easier for symetrical track
@@ -315,12 +315,12 @@ function loop() {
             const leftClip = (midPoint - roadWidth) * w;
             const rightGrass = (midPoint + roadWidth + clipWidth) * w;
             const rightClip = (midPoint + roadWidth) * w;
-           
+
             for (let x = 0; x < w; x++) {
                 //--------------------------//
                 ///Draw  Top (hills and sky)//
                 //--------------------------//
-                hillHeight = hillArray[200+Math.round(x+100*trackCurve)]
+                hillHeight = hillArray[1000 + Math.round(x + 100 * trackCurve)]
                 const pixelindexTop = (((y - (mid)) * w + x) * 4);//Find RGBA pixel index for imageData
                 let colorB = (y > (h) - hillHeight) ? [55 - y * perspective - (dk / 5), 155 - y * perspective - (dk / 5), 55 - y * perspective - (dk / 10)] : [100 + (y * 2) - dk, 100 - dk, 255 - dk];
                 //hill border color
@@ -367,13 +367,10 @@ function loop() {
                 //--------CPU x,y coord-----------//
                 if (y === Math.round(100 - CPU + (20 * perspective))) {
                     CPUy = y;
-                    let scale = Math.pow(CPUy, 2 + (CPUy / 70)) / 1000000;
                     if (CPUy >= 80) {
                         //CPUp -= CPUx*((y-80))
                         CPUp = w / 2;
-
                     } else {
-
                         CPUp = ((w) / 2) + (((currentCurve) * (w))) - (scale * currentCurve * w)
                     }
 
@@ -384,9 +381,7 @@ function loop() {
                 imageData.data[pixelindex + 1] = color[1]  // Green
                 imageData.data[pixelindex + 2] = color[2]   // Blue
                 imageData.data[pixelindex + 3] = 255;   // Alpha
-
             }
-
         }
 
         //--------------------------//
@@ -437,7 +432,7 @@ function loop() {
         }
 
         //CPUspeed += CPUacc-Math.abs(currentCurve/1000);
-        const scale = Math.pow(CPUy, 2 + (CPUy / 70)) / 1000000
+        scale = Math.pow(CPUy, 2 + (CPUy / 70)) / 1000000
 
 
         //--------------------------//
@@ -461,16 +456,13 @@ function loop() {
             renderPlyr();
             renderCPU();
         }
-        // ctx.fillStyle = '#00000055';
-        // ctx.fillRect(0,1,160,2)
-        // ctx.fillRect(0,4,160,2)
-        // ctx.fillStyle = "blue";
-        // ctx.fillRect(Math.round((carDistance/trackLength)*160),1,4,2)
-        // ctx.fillStyle = "red";
-        // ctx.fillRect(Math.round(((CPUd-1590)/trackLength)*160),4,4,2)
-
-
-
+        ctx.fillStyle = '#00000055';
+        ctx.fillRect(0,1,160,2)
+        ctx.fillRect(0,4,160,2)
+        ctx.fillStyle = "blue";
+        ctx.fillRect(Math.round((carDistance/trackLength)*160),1,4,2)
+        ctx.fillStyle = "red";
+        ctx.fillRect(Math.round(((CPUd-1590)/trackLength)*160),4,4,2)
 
         //--------------------------//
         //        Draw Hud          //
@@ -480,9 +472,7 @@ function loop() {
         Time: ${Math.round(seconds)} sec
         Speed: ${Math.round(speed)} mph
         Pos: ${position}${(position === 1) ? "st" : "nd"}`
-        //end loop
-        //loop();
-        //window.requestAnimationFrame(loop);
+
         //----------------------//
         //--------Sounds--------//
         //----------------------//

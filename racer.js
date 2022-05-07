@@ -244,7 +244,7 @@ function loop() {
         }
         //find the target track curve for CPU after fi
         let CPUtargetCurve = trackArray[CPUtrackSection - 1][0];
-        CPUspeed -= Math.abs(CPUtargetCurve / 50);//slow CPU down on curvs
+        CPUspeed -= Math.abs(CPUtargetCurve / 25);//slow CPU down on curvs
 
 
         //if you cross the finish line

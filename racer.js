@@ -244,7 +244,7 @@ function loop() {
         }
         //find the target track curve for CPU after fi
         let CPUtargetCurve = trackArray[CPUtrackSection - 1][0];
-        CPUspeed -= Math.abs(CPUtargetCurve/6.7);//slow CPU down on curvs
+        if (CPUspeed>160) CPUspeed -= Math.abs(CPUtargetCurve/3);//slow CPU down on curvs
 
 
         //if you cross the finish line
@@ -431,7 +431,7 @@ function loop() {
 
         //CPUspeed += CPUacc-Math.abs(currentCurve/1000);
         const scale = Math.pow(CPUy, 2 + (CPUy / 70)) / 1000000
-        console.log(CPUd)
+        
 
         //--------------------------//
         //   Calculate Car Pos      //

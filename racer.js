@@ -58,6 +58,7 @@ let CPUcurve = CPUx/35
 let CPUd = 1590; //cpu distance -must have this offset for some reason
 let CPUtd = 0; //CPU
 let CPUspeed = 1;
+let CPUacc = 0;
 let maxSpd = 160;
 let CPUlap = 0;
 
@@ -85,7 +86,7 @@ let initTime = Date.now();
 var frame = 0;
 // set track sections [curvatrue, dist]
 const trackArray = [
-    [1, 10],
+    [0, 10000],
     [1, 20000],
     [0, 20000],
     [-1, 20000],
@@ -159,9 +160,11 @@ function loop() {
                     acc = .25
             }
             speed += acc;
+            
         } else {
             speed -= 0.2;
         }
+        CPUspeed += CPUacc-Math.abs(currentCurve/10);
         if (keysPressed.includes('x')) {
             speed -= 1;
             if (speed > 188) {
@@ -209,7 +212,7 @@ function loop() {
         //----------------------------------------------//
         //if you are outside the track, force slow down //
         //----------------------------------------------//
-        if (Math.abs(playerCurve - trackCurve) >= 0.55) speed -= .1 * speed;
+        if (Math.abs(playerCurve - trackCurve) >= 0.55) speed -= .01 * speed;
 
         //set speed limits
         if (speed < 0) speed = 0;
@@ -368,20 +371,49 @@ function loop() {
         let newMax = maxSpd;
         if (CPUtd < totalDistance) {
             position = 1;
-            newMax = 225;
         } else {
             position = 2;
-            if (CPUspeed> newMax) CPUspeed-=.4
+            //if (CPUspeed> newMax) CPUspeed-=.4
         }
-        newMax -= Math.abs(currentCurve*90)
-        if (CPUtd-totalDistance>25000 ) CPUspeed = -.4;
-        if(newMax<maxSpd) newMax = maxSpd;
+        //newMax -= Math.abs(currentCurve*90)
+        //if (CPUtd-totalDistance>25000 ) CPUspeed = 0;
+        //if(newMax<maxSpd) newMax = maxSpd;
         
-        if (CPUspeed < newMax) CPUspeed += .4
+        //if (CPUspeed < newMax) CPUspeed += .4
         
-        const scale = Math.pow(CPUy, 2 + (CPUy / 70)) / 1000000
+ 
+        switch (true) {
+            case (CPUspeed < 45):
+                CPUacc = .40;
+                break;
+            case (CPUspeed >= 45 && CPUspeed < 80):
+                CPUacc = .355;
+                break;
+            case (CPUspeed >= 80 && CPUspeed < 121):
+                CPUacc = .27;
+                break;
+            case (CPUspeed >= 121 && CPUspeed < 181):
+                CPUacc = .22;
+                break;
+            case (CPUspeed >= 181 && CPUspeed < 210):
+                CPUacc = .165;
+                break;
+            case (CPUspeed >= 210 && CPUspeed < 219):
+                CPUacc = .11;
+                break;
+            case (CPUspeed >= 219 && CPUspeed < 255):
+                CPUacc = .089;
+                break;
+            case (CPUspeed >= 255):
+                CPUacc = .02;
+                break;
+            default:
+                CPUacc = .25
+        }
 
-        console.log(CPUtd-totalDistance, CPUspeed)
+        //CPUspeed += CPUacc-Math.abs(currentCurve/1000);
+        const scale = Math.pow(CPUy, 2 + (CPUy / 70)) / 1000000
+        console.log(currentCurve, CPUspeed)
 
         //--------------------------//
         //   Calculate Car Pos      //

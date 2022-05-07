@@ -166,7 +166,7 @@ function loop() {
             speed += acc;
 
         } else {
-            speed -= 0.2;
+            speed -= 0.1;
         }
         CPUspeed += CPUacc - Math.abs(currentCurve / 10)
 
@@ -244,7 +244,7 @@ function loop() {
         }
         //find the target track curve for CPU after fi
         let CPUtargetCurve = trackArray[CPUtrackSection - 1][0];
-        CPUspeed -= Math.abs(CPUtargetCurve/7);//slow CPU down on curvs
+        CPUspeed -= Math.abs(CPUtargetCurve/6.7);//slow CPU down on curvs
 
 
         //if you cross the finish line
@@ -405,19 +405,19 @@ function loop() {
                 CPUacc = .41;
                 break;
             case (CPUspeed >= 45 && CPUspeed < 80):
-                CPUacc = .355;
+                CPUacc = .35;
                 break;
             case (CPUspeed >= 80 && CPUspeed < 121):
                 CPUacc = .27;
                 break;
             case (CPUspeed >= 121 && CPUspeed < 181):
-                CPUacc = .22;
+                CPUacc = .21;
                 break;
             case (CPUspeed >= 181 && CPUspeed < 210):
-                CPUacc = .165;
+                CPUacc = .16;
                 break;
             case (CPUspeed >= 210 && CPUspeed < 219):
-                CPUacc = .11;
+                CPUacc = .10;
                 break;
             case (CPUspeed >= 219 && CPUspeed < 255):
                 CPUacc = .085;

@@ -431,7 +431,7 @@ function loop() {
 
         //CPUspeed += CPUacc-Math.abs(currentCurve/1000);
         const scale = Math.pow(CPUy, 2 + (CPUy / 70)) / 1000000
-        console.log(CPUtd - totalDistance, CPUspeed)
+        console.log(CPUd)
 
         //--------------------------//
         //   Calculate Car Pos      //
@@ -454,6 +454,14 @@ function loop() {
             renderPlyr();
             renderCPU();
         }
+        ctx.fillStyle = '#00000055';
+        ctx.fillRect(0,1,160,2)
+        ctx.fillRect(0,4,160,2)
+        ctx.fillStyle = "blue";
+        ctx.fillRect(Math.round((carDistance/trackLength)*160),1,4,2)
+        ctx.fillStyle = "red";
+        ctx.fillRect(Math.round(((CPUd-1590)/trackLength)*160),4,4,2)
+        
 
 
 

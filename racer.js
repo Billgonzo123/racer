@@ -360,7 +360,7 @@ function loop() {
             const firstHalf = topHalf.splice(0, half);
             const secondHalf = event.data;
 
-            const newImage = new Uint8ClampedArray( [...firstHalf, ...secondHalf]);
+            const newImage = new Uint8ClampedArray(firstHalf.concat( secondHalf));
          
             imageData.data.set(newImage);
         

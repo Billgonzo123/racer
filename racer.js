@@ -12,6 +12,9 @@ catch (e) {
 const worker = new Worker("worker.js");; //webworker
 
 let screenSize = window.innerWidth;
+const init_scale = (window.innerWidth) / (1920);
+document.getElementById('game-container').style.transform = `scale(${init_scale})`;
+        
 
 // create Oscillator(s) node
 // Engine 

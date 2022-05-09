@@ -130,11 +130,10 @@ function run() {
         
         const half = 32000;
         
-        console.log(imageData.data)
         const imgArray = Array.from(imageData.data);
          halfImage = imgArray.splice(-half)
          //convert the array back to Uint8ClampedArray
-         //doing so hear has HUGe performance gains
+         //doing so hear has HUGe performance gains in Chrome
          halfImage = new Uint8ClampedArray(halfImage)
         window.requestAnimationFrame(loop)
     }
@@ -150,8 +149,8 @@ function loop() {
         frame++;
         //frame rate counter and timer
         if (time - startTime > 1000) {
-            //console.clear();
-           // console.log('FPS:', (frame / ((time - startTime) / 1000)).toFixed(1));
+            console.clear();
+            console.log('FPS:', (frame / ((time - startTime) / 1000)).toFixed(1));
             startTime = time;
             frame = 0;
         }

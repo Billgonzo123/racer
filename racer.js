@@ -89,7 +89,7 @@ let dk = 0; //day\night effect
 var startTime = Date.now();
 let initTime = Date.now();
 var frame = 0;
-let topHalf = [];
+let halfImage = [];
 
 let hillArray = [];
 // set track sections [curvatrue, dist]
@@ -127,7 +127,15 @@ function run() {
         }
 
         imageData = ctx.createImageData(w, h)
-        topHalf = Array.from(imageData.data);
+        
+        const half = 32000;
+        
+        console.log(imageData.data)
+        const imgArray = Array.from(imageData.data);
+         halfImage = imgArray.splice(-half)
+         //convert the array back to Uint8ClampedArray
+         //doing so hear has HUGe performance gains
+         halfImage = new Uint8ClampedArray(halfImage)
         window.requestAnimationFrame(loop)
     }
 }
@@ -142,8 +150,8 @@ function loop() {
         frame++;
         //frame rate counter and timer
         if (time - startTime > 1000) {
-            // console.clear();
-            // console.log('FPS:', (frame / ((time - startTime) / 1000)).toFixed(1));
+            //console.clear();
+           // console.log('FPS:', (frame / ((time - startTime) / 1000)).toFixed(1));
             startTime = time;
             frame = 0;
         }
@@ -293,7 +301,9 @@ function loop() {
         carX = (w / 2) + ((w * carPosH) / 2) - carM;
         carY = h - 20;
 
-        worker.postMessage({imageData, w, h, mid,  seconds,  currentCurve,  carDistance, trackLength, CPUd, carD,carX, carY, carW, carM, scale});
+
+        //send web worker to work
+        worker.postMessage({ halfImage, w, h, mid, seconds, currentCurve, carDistance, trackLength, carD, carX, carY,  carM });
 
         //--------------------------//
         //      Begin Draw          //
@@ -302,20 +312,12 @@ function loop() {
 
             // make track calculations
             dk = (seconds < 160) ? seconds : 160;//to darken color over time
-            const gY = y * 2;//to create a gradient color
+           
             const perspective = (y - mid) / (mid);
-
-            const midPoint = 0.5 + currentCurve * Math.pow(1 - perspective, 3);
-            let roadWidth = 0.1 + perspective * 0.8;
-            const clipWidth = roadWidth * 0.15;
 
             const perspectivePow = Math.pow(1 - perspective, 2);
            
             const CPU = perspectivePow + ((CPUd - carDistance) * .02)//this is how we make CPU players appear  
-            //get half of road width. makes calculations easier for symetrical track
-            roadWidth *= 0.5;
-
-
             //--------CPU x,y coord-----------//
             if (y === Math.round(100 - CPU + (20 * perspective))) {
                 CPUy = y;
@@ -340,10 +342,10 @@ function loop() {
                     [245 - dk / 1.6, 130 - dk, 230 - dk / 1.3];
                 //[-80 + gY*2 * perspective + dk / 4,  -50 + gY * perspective - dk / 6, -80 + gY*2 * perspective + dk / 4];
                 //-------Set Pixel Data-------//
-                topHalf[pixelindexTop] = colorB[0];     // Red
-                topHalf[pixelindexTop + 1] = colorB[1]; // Green
-                topHalf[pixelindexTop + 2] = colorB[2];  // Blue
-                topHalf[pixelindexTop + 3] = 255;   // Alpha
+                halfImage[pixelindexTop] = colorB[0];     // Red
+                halfImage[pixelindexTop + 1] = colorB[1]; // Green
+                halfImage[pixelindexTop + 2] = colorB[2];  // Blue
+                halfImage[pixelindexTop + 3] = 255;   // Alpha
 
             }
         }
@@ -351,20 +353,15 @@ function loop() {
         //--------------------------//
         //   Render Entire Image    //
         //--------------------------//
-       
         worker.onmessage = function(event){
-         
-            const half = 32000;
-            
-            
-            const firstHalf = topHalf.splice(0, half);
-            const secondHalf = event.data;
-
-            const newImage = new Uint8ClampedArray(firstHalf.concat( secondHalf));
-         
-            imageData.data.set(newImage);
+    
+           imageData.data.set(halfImage);
         
             ctx.putImageData(imageData, 0, 0);
+
+            imageData.data.set( event.data);
+        
+            ctx.putImageData(imageData, 0, mid);
        
        
         //-------------------------//

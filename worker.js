@@ -1,6 +1,7 @@
 
 self.onmessage = (message) => {
-    let { imageData, w, h, mid, seconds, currentCurve, carDistance, trackLength, CPUd, carD, carX, carY, carW, carM, scale } = message.data
+ 
+    let { halfImage, w, h, mid, seconds, currentCurve, carDistance, trackLength, carD, carX, carY,  carM } = message.data
     let color = [255,0,0]
     //--------------------------//
     //      Begin Draw          //
@@ -21,7 +22,6 @@ self.onmessage = (message) => {
         const clipSpace = Math.sin(40 * perspectivePow + carDistance * .02);
 
         const startLine = perspectivePow + ((trackLength - carDistance) * .02);
-        const CPU = perspectivePow + ((CPUd - carDistance) * .02)//this is how we make CPU players appear  
         //get half of road width. makes calculations easier for symetrical track
         roadWidth *= 0.5;
         const leftGrass = (midPoint - roadWidth - clipWidth) * w;
@@ -31,11 +31,10 @@ self.onmessage = (message) => {
 
 
         for (let x = 0; x < w; x++) {
-
             //--------------------------//
             //       Draw Bottom        //
             //--------------------------//
-            const pixelindex = (y * w + x) * 4; //find RGBA pixel index for imageData
+            const pixelindex = ((y-mid) * w + x) * 4; //find RGBA pixel index for imageData
 
             //create head lights
             let circleBound = Math.sqrt(Math.pow(x - (carX + (carD * 11) + carM - 1), 2) + Math.pow(y - carY, 2));
@@ -64,16 +63,17 @@ self.onmessage = (message) => {
 
             
             //--------Set Pixel Data---------//
-            imageData.data[pixelindex] = color[0]      // Red
-            imageData.data[pixelindex + 1] = color[1]  // Green
-            imageData.data[pixelindex + 2] = color[2]   // Blue
-            imageData.data[pixelindex + 3] = 255;   // Alpha
+            halfImage[pixelindex] = color[0]      // Red
+            halfImage[pixelindex + 1] = color[1]  // Green
+            halfImage[pixelindex + 2] = color[2]   // Blue
+            halfImage[pixelindex + 3] = 255;   // Alpha
         }
     }
     //return the half of the screen that was renedered
-    const half = 32000;
-    const top = Array.from(imageData.data);
-    const bottomHalf = top.splice(-half)
-    postMessage(bottomHalf)
+    // const half = 32000;
+    // //we wnat to converts to standard aray AFTER calculation to allow clamping
+    // const top = Array.from(imageData.data);
+    // const bottomHalf = top.splice(-half)
+    postMessage(halfImage)
 }
 

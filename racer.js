@@ -120,7 +120,7 @@ function run() {
         h = canvas.height;
         mid = h / 2;
         //preCalculate hills (currently turned off)
-        for (let i = 0; i < 2000; i++) {
+        for (let i = 0; i < 10000; i++) {
             const hillX = Math.floor(Math.abs(Math.sin(i * 0.01 + trackCurve) * 16.0));
             hillArray.push(hillX)
 
@@ -333,8 +333,7 @@ function loop() {
                 //--------------------------//
                 ///Draw  Top (hills and sky)//
                 //--------------------------//
-                hillHeight =   Math.floor(Math.abs(Math.sin(x * 0.01 + trackCurve) * 16.0));
-                //hillArray[1000 + Math.round(x + 100 * trackCurve)]
+                hillHeight =   hillArray[5000 + Math.round(x + 100 * trackCurve)]
                 const pixelindexTop = (((y - (mid)) * w + x) * 4);//Find RGBA pixel index for imageData
                 let colorB = (y > (h) - hillHeight) ? [55 - y * perspective - (dk / 5), 155 - y * perspective - (dk / 5), 55 - y * perspective - (dk / 10)] : [100 + (y * 2) - dk, 100 - dk, 255 - dk];
                 //hill border color

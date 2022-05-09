@@ -69,11 +69,6 @@ self.onmessage = (message) => {
             halfImage[pixelindex + 3] = 255;   // Alpha
         }
     }
-    //return the half of the screen that was renedered
-    // const half = 32000;
-    // //we wnat to converts to standard aray AFTER calculation to allow clamping
-    // const top = Array.from(imageData.data);
-    // const bottomHalf = top.splice(-half)
     postMessage(halfImage)
 }
 

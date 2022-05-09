@@ -451,10 +451,11 @@ function loop() {
         //        Draw Hud          //
         //--------------------------//
 
-        hudEl.innerHTML = `Lap: ${lap} 
-        Time: ${Math.round(seconds)} sec
-        Speed: ${Math.round(speed)} mph
-        Pos: ${position}${(position === 1) ? "st" : "nd"}`
+        hudEl.innerHTML = `Lap: ${lap} |
+        Pos: ${position}${(position === 1) ? "st" : "nd"} |
+        Time: ${Math.round(seconds)}sec |
+        Speed: ${Math.round(speed)}mph
+        `
 
         //----------------------//
         //--------Sounds--------//

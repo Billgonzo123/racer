@@ -17,6 +17,20 @@ body {
     color: beige;
     left: 360px;
 }
+#hudStats{
+    position: relative;
+    top:-30px;
+    font-size: 25px;
+}
+#controls{
+    position: relative;
+    left: 30%;
+    top: 82%
+}
+#laps-lable{
+    position: relative;
+    left: 30px;
+}
 #lapTimes {
     font-size: 18px;
     height: 300px;

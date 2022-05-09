@@ -11,6 +11,7 @@ catch (e) {
 
 const worker = new Worker("worker.js");; //webworker
 
+let screenSize = window.innerWidth;
 
 // create Oscillator(s) node
 // Engine 
@@ -141,7 +142,14 @@ function run() {
 
 function loop() {
     setInterval(() => {
-      
+      //check screen size
+      if (screenSize !== window.innerWidth) {
+        screenSize = window.innerWidth;
+        const new_scale = (window.innerWidth) / (1920);
+        document.getElementById('game-container').style.transform = `scale(${new_scale})`;
+        
+      }
+
         //console.log(keysPressed)
         let carPosH = (playerCurve - trackCurve);
         var time = Date.now();

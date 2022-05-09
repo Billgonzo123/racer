@@ -7,22 +7,44 @@
 }
 body {
     background-color: rgb(0, 0, 0);
+    overflow: hidden;
 }
 
 .hud{
+    position: relative;
     font-family: 'tiny';
-    font-size:xx-large;
+    font-size:22px;
     color: beige;
+    left: 360px;
+}
+#lapTimes {
+    font-size: 18px;
+    height: 300px;
+    width: 276px;
+    border: 2px solid white;
+    padding: 10px;
+    position: inherit;
+    top: 10px;
+    left: 0px;
 }
 
 #game-window {
-    position: fixed;
+    position: relative;
     /* align elements (0,0) at center */
-    top: 120px;
-    left: 50%;
+    top: 0px;
+    left: 46%;
     /* compensate for (0,0) being top left by shifting up and left 50% of elements dimentions */
     image-rendering: pixelated;
     transform-origin: top center;
-    transform:  scale(5);
+    transform:  scale(8);
     border: 2px solid black;
+}
+
+#game-container{
+    transform: scale(1);
+    transform-origin: top left;
+    top: 0px;
+    left: 0px;
+    width: 1900px;
+    height: 850px;
 }

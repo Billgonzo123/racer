@@ -499,6 +499,8 @@ document.addEventListener("keydown", logKeyDown);
 let tpCache = [];
 const mobileButtons = document.getElementById("mobile-buttons");
 if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){
+    //is on mobile
+  } else {
     mobileButtons.style.display = 'none';
   }
 

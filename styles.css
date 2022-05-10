@@ -58,10 +58,30 @@ body {
 }
 
 #game-container{
+    
     transform: scale(1);
     transform-origin: top left;
     top: 0px;
     left: 0px;
     width: 1900px;
     height: 850px;
+}
+
+
+#mobile-buttons{
+    position: fixed;
+    z-index: 99;
+    top: 70%;
+}
+button{
+    opacity: .5;
+    font-size: xx-large;
+    width: 20vw;
+    height: 20vh;
+    margin: 2vw;
+    min-height: 60px;
+}
+
+button:active {
+    opacity: 1;
 }

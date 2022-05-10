@@ -14,7 +14,7 @@ const worker = new Worker("worker.js");; //webworker
 let screenSize = window.innerWidth;
 const init_scale = (window.innerWidth) / (1920);
 document.getElementById('game-container').style.transform = `scale(${init_scale})`;
-        
+
 
 // create Oscillator(s) node
 // Engine 
@@ -131,27 +131,27 @@ function run() {
         }
 
         imageData = ctx.createImageData(w, h)
-        
+
         const half = 32000;
-        
+
         const imgArray = Array.from(imageData.data);
-         halfImage = imgArray.splice(-half)
-         //convert the array back to Uint8ClampedArray
-         //doing so hear has HUGe performance gains in Chrome
-         halfImage = new Uint8ClampedArray(halfImage)
+        halfImage = imgArray.splice(-half)
+        //convert the array back to Uint8ClampedArray
+        //doing so hear has HUGe performance gains in Chrome
+        halfImage = new Uint8ClampedArray(halfImage)
         window.requestAnimationFrame(loop)
     }
 }
 
 function loop() {
     setInterval(() => {
-      //check screen size
-      if (screenSize !== window.innerWidth) {
-        screenSize = window.innerWidth;
-        const new_scale = (window.innerWidth) / (1920);
-        document.getElementById('game-container').style.transform = `scale(${new_scale})`;
-        
-      }
+        //check screen size
+        if (screenSize !== window.innerWidth) {
+            screenSize = window.innerWidth;
+            const new_scale = (window.innerWidth) / (1920);
+            document.getElementById('game-container').style.transform = `scale(${new_scale})`;
+
+        }
 
         //console.log(keysPressed)
         let carPosH = (playerCurve - trackCurve);
@@ -160,8 +160,8 @@ function loop() {
         frame++;
         //frame rate counter and timer
         if (time - startTime > 1000) {
-            console.clear();
-            console.log('FPS:', (frame / ((time - startTime) / 1000)).toFixed(1));
+            //console.clear();
+            //console.log('FPS:', (frame / ((time - startTime) / 1000)).toFixed(1));
             startTime = time;
             frame = 0;
         }
@@ -313,7 +313,7 @@ function loop() {
 
 
         //send web worker to work
-        worker.postMessage({ halfImage, w, h, mid, seconds, currentCurve, carDistance, trackLength, carD, carX, carY,  carM });
+        worker.postMessage({ halfImage, w, h, mid, seconds, currentCurve, carDistance, trackLength, carD, carX, carY, carM });
 
         //--------------------------//
         //      Begin Draw          //
@@ -322,11 +322,11 @@ function loop() {
 
             // make track calculations
             dk = (seconds < 160) ? seconds : 160;//to darken color over time
-           
+
             const perspective = (y - mid) / (mid);
 
             const perspectivePow = Math.pow(1 - perspective, 2);
-           
+
             const CPU = perspectivePow + ((CPUd - carDistance) * .02)//this is how we make CPU players appear  
             //--------CPU x,y coord-----------//
             if (y === Math.round(100 - CPU + (20 * perspective))) {
@@ -344,7 +344,7 @@ function loop() {
                 //--------------------------//
                 ///Draw  Top (hills and sky)//
                 //--------------------------//
-                hillHeight =   hillArray[5000 + Math.round(x + 100 * trackCurve)]
+                hillHeight = hillArray[5000 + Math.round(x + 100 * trackCurve)]
                 const pixelindexTop = (((y - (mid)) * w + x) * 4);//Find RGBA pixel index for imageData
                 let colorB = (y > (h) - hillHeight) ? [55 - y * perspective - (dk / 5), 155 - y * perspective - (dk / 5), 55 - y * perspective - (dk / 10)] : [100 + (y * 2) - dk, 100 - dk, 255 - dk];
                 //hill border color
@@ -363,113 +363,113 @@ function loop() {
         //--------------------------//
         //   Render Entire Image    //
         //--------------------------//
-        worker.onmessage = function(event){
-    
-           imageData.data.set(halfImage);
-        
+        worker.onmessage = function (event) {
+
+            imageData.data.set(halfImage);
+
             ctx.putImageData(imageData, 0, 0);
 
-            imageData.data.set( event.data);
-        
+            imageData.data.set(event.data);
+
             ctx.putImageData(imageData, 0, mid);
-       
-       
-        //-------------------------//
-        //----Calculate CPU scale and speed-------//
-        //------------------------//
-        if (CPUd >= trackLength) CPUd = 0;
-        const addSpd = Math.round(1000 * CPUspeed) / 1000;
-        CPUd += addSpd; //Add current track distance
-        CPUtd += addSpd; //add to total distance CPU
-        if (CPUtd < totalDistance) {
-            position = 1;
-        } else {
-            position = 2;
-        }
 
 
-        switch (true) {
-            case (CPUspeed < 45):
-                CPUacc = .41;
-                break;
-            case (CPUspeed >= 45 && CPUspeed < 80):
-                CPUacc = .35;
-                break;
-            case (CPUspeed >= 80 && CPUspeed < 121):
-                CPUacc = .27;
-                break;
-            case (CPUspeed >= 121 && CPUspeed < 181):
-                CPUacc = .21;
-                break;
-            case (CPUspeed >= 181 && CPUspeed < 210):
-                CPUacc = .16;
-                break;
-            case (CPUspeed >= 210 && CPUspeed < 219):
-                CPUacc = .10;
-                break;
-            case (CPUspeed >= 219 && CPUspeed < 255):
-                CPUacc = .085;
-                break;
-            case (CPUspeed >= 255):
-                CPUacc = 0;
-                break;
-            default:
-                CPUacc = .25
-        }
-
-        //CPUspeed += CPUacc-Math.abs(currentCurve/1000);
-        scale = Math.pow(CPUy, 2 + (CPUy / 70)) / 1000000
+            //-------------------------//
+            //----Calculate CPU scale and speed-------//
+            //------------------------//
+            if (CPUd >= trackLength) CPUd = 0;
+            const addSpd = Math.round(1000 * CPUspeed) / 1000;
+            CPUd += addSpd; //Add current track distance
+            CPUtd += addSpd; //add to total distance CPU
+            if (CPUtd < totalDistance) {
+                position = 1;
+            } else {
+                position = 2;
+            }
 
 
-        //--------------------------//
-        //   Calculate Car Pos      //
-        //--------------------------//
-        carX = Math.round(carX);
-        carY = Math.round(carY);
+            switch (true) {
+                case (CPUspeed < 45):
+                    CPUacc = .41;
+                    break;
+                case (CPUspeed >= 45 && CPUspeed < 80):
+                    CPUacc = .35;
+                    break;
+                case (CPUspeed >= 80 && CPUspeed < 121):
+                    CPUacc = .27;
+                    break;
+                case (CPUspeed >= 121 && CPUspeed < 181):
+                    CPUacc = .21;
+                    break;
+                case (CPUspeed >= 181 && CPUspeed < 210):
+                    CPUacc = .16;
+                    break;
+                case (CPUspeed >= 210 && CPUspeed < 219):
+                    CPUacc = .10;
+                    break;
+                case (CPUspeed >= 219 && CPUspeed < 255):
+                    CPUacc = .085;
+                    break;
+                case (CPUspeed >= 255):
+                    CPUacc = 0;
+                    break;
+                default:
+                    CPUacc = .25
+            }
 
-        //--------------------------//
-        //--Car & CPU Render functions--//
-        CPUx = Math.round(CPUx);
-        const renderPlyr = () => ctx.drawImage(img, carX, carY - 12)
-        const renderCPU = () => { if (CPUy > 60 && CPUy < h - 2) ctx.drawImage(CPUImage, CPUp + (-17 + CPUx) * scale, CPUy - 12, 36 * scale, 24 * scale); }
+            //CPUspeed += CPUacc-Math.abs(currentCurve/1000);
+            scale = Math.pow(CPUy, 2 + (CPUy / 70)) / 1000000
 
-        //-- which to render first--//
-        if (CPUy < 80) {
-            renderCPU();
-            renderPlyr();
-        } else {
 
-            renderPlyr();
-            renderCPU();
-        }
-        ctx.fillStyle = '#00000055';
-        ctx.fillRect(0, 1, 160, 2)
-        ctx.fillRect(0, 4, 160, 2)
-        ctx.fillStyle = "blue";
-        ctx.fillRect(Math.round((carDistance / trackLength) * 160), 1, 4, 2)
-        ctx.fillStyle = "red";
-        ctx.fillRect(Math.round(((CPUd - 1590) / trackLength) * 160), 4, 4, 2)
+            //--------------------------//
+            //   Calculate Car Pos      //
+            //--------------------------//
+            carX = Math.round(carX);
+            carY = Math.round(carY);
 
-        //--------------------------//
-        //        Draw Hud          //
-        //--------------------------//
+            //--------------------------//
+            //--Car & CPU Render functions--//
+            CPUx = Math.round(CPUx);
+            const renderPlyr = () => ctx.drawImage(img, carX, carY - 12)
+            const renderCPU = () => { if (CPUy > 60 && CPUy < h - 2) ctx.drawImage(CPUImage, CPUp + (-17 + CPUx) * scale, CPUy - 12, 36 * scale, 24 * scale); }
 
-        hudEl.innerHTML = `Lap: ${lap} |
+            //-- which to render first--//
+            if (CPUy < 80) {
+                renderCPU();
+                renderPlyr();
+            } else {
+
+                renderPlyr();
+                renderCPU();
+            }
+            ctx.fillStyle = '#00000055';
+            ctx.fillRect(0, 1, 160, 2)
+            ctx.fillRect(0, 4, 160, 2)
+            ctx.fillStyle = "blue";
+            ctx.fillRect(Math.round((carDistance / trackLength) * 160), 1, 4, 2)
+            ctx.fillStyle = "red";
+            ctx.fillRect(Math.round(((CPUd - 1590) / trackLength) * 160), 4, 4, 2)
+
+            //--------------------------//
+            //        Draw Hud          //
+            //--------------------------//
+
+            hudEl.innerHTML = `Lap: ${lap} |
         Pos: ${position}${(position === 1) ? "st" : "nd"} |
         Time: ${Math.round(seconds)}sec |
         Speed: ${Math.round(speed)}mph
         `
 
-        //----------------------//
-        //--------Sounds--------//
-        //----------------------//
-        const gear = (speed >= 181) ? (speed / 1064) : acc;
-        engSnd.frequency.setValueAtTime(speed * (3 * gear), audioCtx.currentTime); // value in hertz
-        const tireFeq = (Math.floor(carDistance) % 2)
-        tireSnd.frequency.setValueAtTime(920 + (50 * tireFeq), audioCtx.currentTime)
+            //----------------------//
+            //--------Sounds--------//
+            //----------------------//
+            const gear = (speed >= 181) ? (speed / 1064) : acc;
+            engSnd.frequency.setValueAtTime(speed * (3 * gear), audioCtx.currentTime); // value in hertz
+            const tireFeq = (Math.floor(carDistance) % 2)
+            tireSnd.frequency.setValueAtTime(920 + (50 * tireFeq), audioCtx.currentTime)
         };
 
-    }, 1000/60)
+    }, 1000 / 60)
 
 }
 
@@ -487,8 +487,64 @@ const logKeyUp = (e) => {
     //console.log(keysPressed)
 };
 
+//----------------------------------//
+//---------Touch Controls-----------//
+//----------------------------------//
+
+const touchButtons = (e) => {
+
+    switch (e.target.id) {
+        case 'accBtn':
+            if (!keysPressed.includes('z')) keysPressed = [...keysPressed, 'z'];
+            break
+        case 'breakBtn':
+            if (!keysPressed.includes('z')) keysPressed = [...keysPressed, 'x'];
+            break
+        case 'rightBtn':
+            if (!keysPressed.includes('z')) keysPressed = [...keysPressed, 'arrowright'];
+            break
+        case 'leftBtn':
+            if (!keysPressed.includes('z')) keysPressed = [...keysPressed, 'arrowleft'];
+            break
+    }
+
+}
+
+const touchButtonsRelease = (e) => {
+
+    let newKeys 
+    switch (e.target.id) {
+        case 'accBtn':
+             newKeys = keysPressed.filter((key) => key !== "z");
+            if (newKeys !== keysPressed) keysPressed = newKeys;;
+            break
+        case 'breakBtn':
+             newKeys = keysPressed.filter((key) => key !== "x");
+            if (newKeys !== keysPressed) keysPressed = newKeys;
+            break
+        case 'rightBtn':
+             newKeys = keysPressed.filter((key) => key !== "arrowright");
+            if (newKeys !== keysPressed) keysPressed = newKeys;
+            break
+        case 'leftBtn':
+             newKeys = keysPressed.filter((key) => key !== "arrowleft");
+            if (newKeys !== keysPressed) keysPressed = newKeys;
+            break
+    }
+
+}
 document.addEventListener("keyup", logKeyUp);
 document.addEventListener("keydown", logKeyDown);
+
+const mobileButtons = document.getElementById("mobile-buttons");
+if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){
+    //is mobile
+  }else{
+      mobileButtons.style.display='none';
+    //not mobile
+  }
+mobileButtons.addEventListener("touchstart", touchButtons)
+mobileButtons.addEventListener("touchend", touchButtonsRelease)
 
 run();
 

@@ -498,9 +498,9 @@ document.addEventListener("keydown", logKeyDown);
 // Touch Point cache
 let tpCache = [];
 const mobileButtons = document.getElementById("mobile-buttons");
-if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){
-    mobileButtons.style.display = 'none';
-  }
+// if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){
+//     mobileButtons.style.display = 'none';
+//   }
 
 
 window.addEventListener('touchstart', function (event) {
@@ -515,9 +515,9 @@ window.addEventListener('touchend', function (event) {
 }, false);
 
 function getTouch (event) {
-    const e = event.targetTouches;
+    const e = event.touches ;
     tpCache = [];
-    for (let i = 0; i < event.targetTouches.length; i++) {
+    for (let i = 0; i < event.touches.length; i++) {
         tpCache.push(e[i].target.id)
     }
     console.log(tpCache)

@@ -491,14 +491,11 @@ const logKeyUp = (e) => {
 document.addEventListener("keyup", logKeyUp);
 document.addEventListener("keydown", logKeyDown);
 
-// Log events flag
-let logEvents = false;
-
 // Touch Point cache
 let tpCache = [];
 const mobileButtons = document.getElementById("mobile-buttons");
 
-mobileButtons.addEventListener('touchmove', function(event) {
+window.addEventListener('touchstart', function(event) {
     const e = event.targetTouches ;
     tpCache = [];
     for (let i = 0; i < event.targetTouches.length; i++) {

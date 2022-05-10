@@ -504,7 +504,7 @@ window.addEventListener('touchstart', function(event) {
     console.log(tpCache)
   }, false);
   
-  mobileButtons.addEventListener('touchend', function(event) {
+  window.addEventListener('touchend', function(event) {
     const e = event.targetTouches ;
     tpCache = [];
     for (let i = 0; i < event.targetTouches.length; i++) {

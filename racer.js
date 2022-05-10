@@ -169,7 +169,7 @@ function loop() {
         //   Pre-draw calculations  //
         //--------------------------//
 
-        if (keysPressed.includes('z')) {
+        if (keysPressed.includes('z') || tpCache.includes('accBtn')) {
             switch (true) {
                 case (speed < 45):
                     acc = .45;
@@ -206,7 +206,7 @@ function loop() {
         //accelerate CPU and lower acc on curves
         CPUspeed += CPUacc - Math.abs(currentCurve / 10)
 
-        if (keysPressed.includes('x')) {
+        if (keysPressed.includes('x') || tpCache.includes('breakBtn')) {
             speed -= 1;
             if (speed > 188) {
                 tireGain.gain.value = .3;
@@ -487,52 +487,7 @@ const logKeyUp = (e) => {
     //console.log(keysPressed)
 };
 
-//----------------------------------//
-//---------Touch Controls-----------//
-//----------------------------------//
 
-const touchButtons = (e) => {
-
-    switch (e.target.id) {
-        case 'accBtn':
-            if (!keysPressed.includes('z')) keysPressed = [...keysPressed, 'z'];
-            break
-        case 'breakBtn':
-            if (!keysPressed.includes('z')) keysPressed = [...keysPressed, 'x'];
-            break
-        case 'rightBtn':
-            if (!keysPressed.includes('z')) keysPressed = [...keysPressed, 'arrowright'];
-            break
-        case 'leftBtn':
-            if (!keysPressed.includes('z')) keysPressed = [...keysPressed, 'arrowleft'];
-            break
-    }
-
-}
-
-const touchButtonsRelease = (e) => {
-
-    let newKeys 
-    switch (e.target.id) {
-        case 'accBtn':
-             newKeys = keysPressed.filter((key) => key !== "z");
-            if (newKeys !== keysPressed) keysPressed = newKeys;;
-            break
-        case 'breakBtn':
-             newKeys = keysPressed.filter((key) => key !== "x");
-            if (newKeys !== keysPressed) keysPressed = newKeys;
-            break
-        case 'rightBtn':
-             newKeys = keysPressed.filter((key) => key !== "arrowright");
-            if (newKeys !== keysPressed) keysPressed = newKeys;
-            break
-        case 'leftBtn':
-             newKeys = keysPressed.filter((key) => key !== "arrowleft");
-            if (newKeys !== keysPressed) keysPressed = newKeys;
-            break
-    }
-
-}
 document.addEventListener("keyup", logKeyUp);
 document.addEventListener("keydown", logKeyDown);
 
@@ -540,26 +495,28 @@ document.addEventListener("keydown", logKeyDown);
 let logEvents = false;
 
 // Touch Point cache
-let tpCache = new Array();
+let tpCache = [];
 const mobileButtons = document.getElementById("mobile-buttons");
-if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){
-    //is mobile
-  }else{
-      mobileButtons.style.display='none';
-    //not mobile
-  }
-mobileButtons.addEventListener("touchmove", touchButtons)
-mobileButtons.addEventListener("touchend", touchButtonsRelease)
 
-function set_handlers(name) {
-    // Install event handlers for the given element
-    var el=document.getElementById(name);
-    el.ontouchstart = start_handler;
-    el.ontouchmove = move_handler;
-    // Use same handler for touchcancel and touchend
-    el.ontouchcancel = end_handler;
-    el.ontouchend = end_handler;
-   }
+mobileButtons.addEventListener('touchmove', function(event) {
+    const e = event.targetTouches ;
+    tpCache = [];
+    for (let i = 0; i < event.targetTouches.length; i++) {
+        tpCache.push(e[i].target.id)
+    }
+    console.log(tpCache)
+  }, false);
+  
+  mobileButtons.addEventListener('touchend', function(event) {
+    const e = event.targetTouches ;
+    tpCache = [];
+    for (let i = 0; i < event.targetTouches.length; i++) {
+        tpCache.push(e[i].target.id)
+    }
+    console.log(tpCache)
+  }, false);
+
+
 
 run();
 

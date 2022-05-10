@@ -537,12 +537,12 @@ document.addEventListener("keyup", logKeyUp);
 document.addEventListener("keydown", logKeyDown);
 
 const mobileButtons = document.getElementById("mobile-buttons");
-if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){
-    //is mobile
-  }else{
-      mobileButtons.style.display='none';
-    //not mobile
-  }
+// if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){
+//     //is mobile
+//   }else{
+//       mobileButtons.style.display='none';
+//     //not mobile
+//   }
 mobileButtons.addEventListener("touchstart", touchButtons)
 mobileButtons.addEventListener("touchend", touchButtonsRelease)
 

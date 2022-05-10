@@ -498,11 +498,11 @@ document.addEventListener("keydown", logKeyDown);
 // Touch Point cache
 let tpCache = [];
 const mobileButtons = document.getElementById("mobile-buttons");
-if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){
-    //is on mobile
-  } else {
-    mobileButtons.style.display = 'none';
-  }
+// if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){
+//     //is on mobile
+//   } else {
+//     mobileButtons.style.display = 'none';
+//   }
 
 
 window.addEventListener('touchstart', function (event) {

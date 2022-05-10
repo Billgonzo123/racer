@@ -69,7 +69,8 @@ body {
 
 
 #mobile-buttons{
-    position: fixed;
+    width: 100%;
+    position: sticky;
     z-index: 99;
     top: 70%;
 }

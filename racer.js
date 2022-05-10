@@ -536,6 +536,11 @@ const touchButtonsRelease = (e) => {
 document.addEventListener("keyup", logKeyUp);
 document.addEventListener("keydown", logKeyDown);
 
+// Log events flag
+let logEvents = false;
+
+// Touch Point cache
+let tpCache = new Array();
 const mobileButtons = document.getElementById("mobile-buttons");
 if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){
     //is mobile
@@ -543,8 +548,18 @@ if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigat
       mobileButtons.style.display='none';
     //not mobile
   }
-mobileButtons.addEventListener("touchstart", touchButtons)
+mobileButtons.addEventListener("touchmove", touchButtons)
 mobileButtons.addEventListener("touchend", touchButtonsRelease)
+
+function set_handlers(name) {
+    // Install event handlers for the given element
+    var el=document.getElementById(name);
+    el.ontouchstart = start_handler;
+    el.ontouchmove = move_handler;
+    // Use same handler for touchcancel and touchend
+    el.ontouchcancel = end_handler;
+    el.ontouchend = end_handler;
+   }
 
 run();
 

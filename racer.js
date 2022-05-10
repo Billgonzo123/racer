@@ -498,24 +498,30 @@ document.addEventListener("keydown", logKeyDown);
 // Touch Point cache
 let tpCache = [];
 const mobileButtons = document.getElementById("mobile-buttons");
+if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){
+    mobileButtons.style.display = 'none';
+  }
+
 
 window.addEventListener('touchstart', function (event) {
-    const e = event.targetTouches;
-    tpCache = [];
-    for (let i = 0; i < event.targetTouches.length; i++) {
-        tpCache.push(e[i].target.id)
-    }
-    console.log(tpCache)
+    getTouch (event)
+}, false);
+window.addEventListener('touchmove', function (event) {
+    getTouch (event)
 }, false);
 
 window.addEventListener('touchend', function (event) {
+    getTouch (event)
+}, false);
+
+function getTouch (event) {
     const e = event.targetTouches;
     tpCache = [];
     for (let i = 0; i < event.targetTouches.length; i++) {
         tpCache.push(e[i].target.id)
     }
     console.log(tpCache)
-}, false);
+}
 
 
 

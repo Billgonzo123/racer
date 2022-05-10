@@ -504,6 +504,7 @@ const mobileButtons = document.getElementById("mobile-buttons");
 
 
 window.addEventListener('touchstart', function (event) {
+    audioCtx.resume();//must resume audio context with user input
     getTouch (event)
 }, false);
 window.addEventListener('touchmove', function (event) {

@@ -216,22 +216,26 @@ function loop() {
         //init car direction
         carD = 0;
         const c = Math.abs(targetCurve - currentCurve);
-        if (keysPressed.includes('arrowleft') && speed > 0) {
-            carD = -1;
-            playerCurve -= (.015);
-            if (c > .2 && speed > 160) tireGain.gain.value = .3;
+        if (keysPressed.includes('arrowleft') || tpCache.includes('leftBtn')) {
+            if (speed > 0) {
+                carD = -1;
+                playerCurve -= (.015);
+                if (c > .2 && speed > 160) tireGain.gain.value = .3;
+            }
         } else {
-            if (!keysPressed.includes('arrowright') && !keysPressed.includes('x')) {
+            if (!keysPressed.includes('arrowright') && tpCache.includes('rightBtn') && !keysPressed.includes('x')) {
                 tireGain.gain.value = 0;
             }
         }
 
-        if (keysPressed.includes('arrowright') && speed > 0) {
-            carD = 1;
-            playerCurve += (.015);
-            if (c > .2 && speed > 160) tireGain.gain.value = .3;
+        if (keysPressed.includes('arrowright') || tpCache.includes('rightBtn')) {
+            if (speed > 0) {
+                carD = 1;
+                playerCurve += (.015);
+                if (c > .2 && speed > 160) tireGain.gain.value = .3;
+            }
         } else {
-            if (!keysPressed.includes('arrowleft') && !keysPressed.includes('x')) {
+            if (!keysPressed.includes('arrowleft') && tpCache.includes('leftBtn') && !keysPressed.includes('x')) {
                 tireGain.gain.value = 0;
             }
         }
@@ -495,23 +499,23 @@ document.addEventListener("keydown", logKeyDown);
 let tpCache = [];
 const mobileButtons = document.getElementById("mobile-buttons");
 
-window.addEventListener('touchstart', function(event) {
-    const e = event.targetTouches ;
+window.addEventListener('touchstart', function (event) {
+    const e = event.targetTouches;
     tpCache = [];
     for (let i = 0; i < event.targetTouches.length; i++) {
         tpCache.push(e[i].target.id)
     }
     console.log(tpCache)
-  }, false);
-  
-  window.addEventListener('touchend', function(event) {
-    const e = event.targetTouches ;
+}, false);
+
+window.addEventListener('touchend', function (event) {
+    const e = event.targetTouches;
     tpCache = [];
     for (let i = 0; i < event.targetTouches.length; i++) {
         tpCache.push(e[i].target.id)
     }
     console.log(tpCache)
-  }, false);
+}, false);
 
 
 

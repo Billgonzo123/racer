@@ -508,7 +508,7 @@ function loop() {
              const CPUdComp = CPUd - 1590;
             const CPUgear = (CPUspeed >= 181) ? (CPUspeed/1064 ) : CPUacc;
             if  ((CPUdComp-carDistance < 3000) && (CPUdComp-carDistance > -3000) && CPUspeed>0) {
-                CPUGain.gain.value = .2 - Math.abs((CPUdComp-carDistance)/20000);
+                CPUGain.gain.value = .2 - Math.abs((CPUdComp-carDistance)/15000);
                 CPUSnd.frequency.setValueAtTime((CPUspeed * 3 * CPUgear)- Math.abs((CPUdComp-carDistance)/100), audioCtx.currentTime); // value in hertz
             } else {
                 CPUSnd.frequency.setValueAtTime(0, audioCtx.currentTime); // value in hertz

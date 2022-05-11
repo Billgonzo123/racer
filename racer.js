@@ -22,7 +22,7 @@ const engSnd = audioCtx.createOscillator();
 engSnd.frequency.setValueAtTime(0, audioCtx.currentTime); // value in hertz
 engSnd.type = 'square';
 const engGain = audioCtx.createGain();
-engGain.gain.value = .4;
+engGain.gain.value = .2;
 engSnd.connect(engGain);
 engGain.connect(audioCtx.destination);
 engSnd.start();
@@ -31,7 +31,7 @@ const CPUSnd = audioCtx.createOscillator();
 CPUSnd.frequency.setValueAtTime(0, audioCtx.currentTime); // value in hertz
 CPUSnd.type = 'sawtooth';
 const CPUGain = audioCtx.createGain();
-CPUGain.gain.value = .4;
+CPUGain.gain.value = .2;
 CPUSnd.connect(CPUGain);
 CPUGain.connect(audioCtx.destination);
 CPUSnd.start();
@@ -216,10 +216,12 @@ function loop() {
         //accelerate CPU and lower acc on curves
         if (hold<100)  CPUspeed += CPUacc - Math.abs(currentCurve / 10)
 
+        tireGain.gain.value = 0;
+
         if (keysPressed.includes('x') || tpCache.includes('breakBtn')) {
             speed -= 1;
             if (speed > 188) {
-                tireGain.gain.value = .3;
+                tireGain.gain.value = .2;
                 speed -= 5;
             }
         }
@@ -230,7 +232,7 @@ function loop() {
             if (speed > 0) {
                 carD = -1;
                 playerCurve -= (.015);
-                if (c > .2 && speed > 160) tireGain.gain.value = .3;
+                if (c > .2 && speed > 160) tireGain.gain.value = .2;
             }
         } else {
             if (!keysPressed.includes('arrowright') && tpCache.includes('rightBtn') && !keysPressed.includes('x')) {
@@ -242,7 +244,7 @@ function loop() {
             if (speed > 0) {
                 carD = 1;
                 playerCurve += (.015);
-                if (c > .2 && speed > 160) tireGain.gain.value = .3;
+                if (c > .2 && speed > 160) tireGain.gain.value = .2;
             }
         } else {
             if (!keysPressed.includes('arrowleft') && tpCache.includes('leftBtn') && !keysPressed.includes('x')) {
@@ -502,10 +504,11 @@ function loop() {
             const tireFeq = (Math.floor(carDistance) % 2)
             tireSnd.frequency.setValueAtTime(920 + (50 * tireFeq), audioCtx.currentTime)
              ///cpu sound
+             const CPUdComp = CPUd - 1590;
             const CPUgear = (CPUspeed >= 181) ? (CPUspeed/1064 ) : CPUacc;
-            if  ((CPUtd-totalDistance < 3000) && (CPUtd-totalDistance > -3000) && CPUspeed>0) {
-                CPUGain.gain.value = .4 - Math.abs((CPUtd-totalDistance)/6000);
-                CPUSnd.frequency.setValueAtTime((CPUspeed * 3 * CPUgear)- Math.abs((CPUtd-totalDistance)/100), audioCtx.currentTime); // value in hertz
+            if  ((CPUdComp-carDistance < 3000) && (CPUdComp-carDistance > -3000) && CPUspeed>0) {
+                CPUGain.gain.value = .2 - Math.abs((CPUdComp-carDistance)/20000);
+                CPUSnd.frequency.setValueAtTime((CPUspeed * 3 * CPUgear)- Math.abs((CPUdComp-carDistance)/100), audioCtx.currentTime); // value in hertz
             } else {
                 CPUSnd.frequency.setValueAtTime(0, audioCtx.currentTime); // value in hertz
             }

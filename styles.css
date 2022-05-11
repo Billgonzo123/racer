@@ -76,6 +76,9 @@ body {
     top:70%;
 }
 button{
+    border: none;
+    outline: none;
+    background-color: transparent;
     position:fixed;
     background-repeat: no-repeat;
     background-position: center;
@@ -116,3 +119,29 @@ top: 60%;
     top: 65%;
     left: 80%;
 }
+
+
+@media screen and (orientation:portrait) { 
+    button{
+        width: 30vw;
+        height: 20vh;
+    }
+    #leftBtn{
+        top: 60%;
+        left: -2%;
+        }
+        #rightBtn{
+            top: 60%;
+            left: 30%;
+        }
+        #accBtn{
+            top: 50%;
+            left: 68%;
+            
+        }
+        #breakBtn{
+            background-image: url(./img/b-button.png);
+            top: 72%;
+            left: 68%;
+        }
+ }

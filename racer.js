@@ -550,7 +550,7 @@ if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(naviga
 
 
 window.addEventListener('touchstart', function (event) {
-    audioCtx.resume();//must resume audio context with user input
+    
     getTouch(event)
 }, false);
 window.addEventListener('touchmove', function (event) {
@@ -563,6 +563,7 @@ window.addEventListener('touchend', function (event) {
 }, false);
 
 function getTouch(event) {
+    audioCtx.resume();//must resume audio context with user input
     const e = event.touches;
     tpCache = [];
     for (let i = 0; i < event.touches.length; i++) {

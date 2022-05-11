@@ -209,7 +209,7 @@ function loop() {
                 default:
                     acc = .25
             }
-             speed += acc;
+           if (hold<100)  speed += acc;
 
         } else {
             speed -= 0.1;
@@ -522,11 +522,10 @@ function loop() {
 
 /////////////Key inputs///////////////////
 const logKeyDown = (e) => {
-    if (hold<100) {
     audioCtx.resume();//must resume audio context with user input
     if (!keysPressed.includes(e.key)) keysPressed = [...keysPressed, e.key.toLowerCase()];
     //console.log(keysPressed)
-    }
+    
 };
 
 const logKeyUp = (e) => {

@@ -26,6 +26,15 @@ engGain.gain.value = .4;
 engSnd.connect(engGain);
 engGain.connect(audioCtx.destination);
 engSnd.start();
+// CpuEngine 
+const CPUSnd = audioCtx.createOscillator();
+CPUSnd.frequency.setValueAtTime(0, audioCtx.currentTime); // value in hertz
+CPUSnd.type = 'sawtooth';
+const CPUGain = audioCtx.createGain();
+CPUGain.gain.value = .4;
+CPUSnd.connect(CPUGain);
+CPUGain.connect(audioCtx.destination);
+CPUSnd.start();
 
 // Tire skreach
 const tireSnd = audioCtx.createOscillator();
@@ -488,9 +497,19 @@ function loop() {
             //--------Sounds--------//
             //----------------------//
             const gear = (speed >= 181) ? (speed / 1064) : acc;
-            engSnd.frequency.setValueAtTime(speed * (3 * gear), audioCtx.currentTime); // value in hertz
+            engSnd.frequency.setValueAtTime(speed * 3 * gear, audioCtx.currentTime); // value in hertz
+
             const tireFeq = (Math.floor(carDistance) % 2)
             tireSnd.frequency.setValueAtTime(920 + (50 * tireFeq), audioCtx.currentTime)
+             ///cpu sound
+            const CPUgear = (CPUspeed >= 181) ? (CPUspeed/1064 ) : CPUacc;
+            if  ((CPUtd-totalDistance < 3000) && (CPUtd-totalDistance > -3000) && CPUspeed>0) {
+                CPUGain.gain.value = .4 - Math.abs((CPUtd-totalDistance)/6000);
+                CPUSnd.frequency.setValueAtTime((CPUspeed * 3 * CPUgear)- Math.abs((CPUtd-totalDistance)/100), audioCtx.currentTime); // value in hertz
+            } else {
+                CPUSnd.frequency.setValueAtTime(0, audioCtx.currentTime); // value in hertz
+            }
+            
         };
 
     }, 1000 / 60)

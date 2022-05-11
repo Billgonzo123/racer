@@ -25,8 +25,8 @@ const engGain = audioCtx.createGain();
 engGain.gain.value = .4;
 engSnd.connect(engGain);
 engGain.connect(audioCtx.destination);
-
 engSnd.start();
+
 // Tire skreach
 const tireSnd = audioCtx.createOscillator();
 tireSnd.frequency.setValueAtTime(0, audioCtx.currentTime); // value in hertz
@@ -41,6 +41,7 @@ tireSnd.start()
 const lapEl = document.getElementById('lapTimes');
 let newLapTime = 0;
 let lapAcc = 0;
+let hold = 400;
 //---------Game Vars--------//
 let keysPressed = [];
 let carDistance = 0;
@@ -64,7 +65,7 @@ let CPUp = 0; //CPU H-Position
 let CPUcurve = CPUx / 35
 let CPUd = 1590; //cpu distance -must have this offset for some reason
 let CPUtd = 0; //CPU
-let CPUspeed = 1;
+let CPUspeed = 0;
 let CPUacc = 0;
 let maxSpd = 160;
 let CPUlap = 0;
@@ -138,7 +139,7 @@ function run() {
         halfImage = imgArray.splice(-half)
         //convert the array back to Uint8ClampedArray
         //doing so hear has HUGe performance gains in Chrome
-        halfImage = new Uint8ClampedArray(halfImage)
+        halfImage = new Uint8ClampedArray(halfImage)  
         window.requestAnimationFrame(loop)
     }
 }
@@ -198,13 +199,13 @@ function loop() {
                 default:
                     acc = .25
             }
-            speed += acc;
+             speed += acc;
 
         } else {
             speed -= 0.1;
         }
         //accelerate CPU and lower acc on curves
-        CPUspeed += CPUacc - Math.abs(currentCurve / 10)
+        if (hold<100)  CPUspeed += CPUacc - Math.abs(currentCurve / 10)
 
         if (keysPressed.includes('x') || tpCache.includes('breakBtn')) {
             speed -= 1;
@@ -394,7 +395,7 @@ function loop() {
 
             switch (true) {
                 case (CPUspeed < 45):
-                    CPUacc = .41;
+                    CPUacc = .42;
                     break;
                 case (CPUspeed >= 45 && CPUspeed < 80):
                     CPUacc = .35;
@@ -454,6 +455,25 @@ function loop() {
             ctx.fillStyle = "red";
             ctx.fillRect(Math.round(((CPUd - 1590) / trackLength) * 160), 4, 4, 2)
 
+            if (hold>0){
+                hold--;
+                const image = new Image();
+                let lightColor = '';
+                switch(true) {
+                    case (hold > 300):  lightColor = './img/red.png'
+                    break;
+                    case (hold > 200): lightColor = './img/orange.png'
+                    break;
+                    case (hold > 100): lightColor = './img/yellow.png'
+                    break;
+                    case (hold > 0): lightColor = './img/green.png'
+                    break;
+                }
+              
+            image.src = lightColor;
+            ctx.drawImage(image, w / 2 - 6, h / 2 - 16)
+            }
+
             //--------------------------//
             //        Draw Hud          //
             //--------------------------//
@@ -479,10 +499,11 @@ function loop() {
 
 /////////////Key inputs///////////////////
 const logKeyDown = (e) => {
-
+    if (hold<100) {
     audioCtx.resume();//must resume audio context with user input
     if (!keysPressed.includes(e.key)) keysPressed = [...keysPressed, e.key.toLowerCase()];
     //console.log(keysPressed)
+    }
 };
 
 const logKeyUp = (e) => {
@@ -498,17 +519,17 @@ document.addEventListener("keydown", logKeyDown);
 // Touch Point cache
 let tpCache = [];
 const mobileButtons = document.getElementById("mobile-buttons");
-if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){
+if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
     //is mobile
-  }else{
-      mobileButtons.style.display='none';
+} else {
+    mobileButtons.style.display = 'none';
     //not mobile
-  }
+}
 
 
 window.addEventListener('touchstart', function (event) {
     audioCtx.resume();//must resume audio context with user input
-    getTouch (event)
+    getTouch(event)
 }, false);
 window.addEventListener('touchmove', function (event) {
     console.log(event)
@@ -516,11 +537,11 @@ window.addEventListener('touchmove', function (event) {
 }, false);
 
 window.addEventListener('touchend', function (event) {
-    getTouch (event)
+    getTouch(event)
 }, false);
 
-function getTouch (event) {
-    const e = event.touches ;
+function getTouch(event) {
+    const e = event.touches;
     tpCache = [];
     for (let i = 0; i < event.touches.length; i++) {
         tpCache.push(e[i].target.id)

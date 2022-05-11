@@ -68,6 +68,13 @@ body {
     height: 850px;
 }
 
+#go-light{
+    position: relative;
+    left: 50%;
+    top: 50%;
+    z-index: 999;
+}
+
 
 #mobile-buttons{
     width: 100vw;

@@ -511,7 +511,8 @@ window.addEventListener('touchstart', function (event) {
     getTouch (event)
 }, false);
 window.addEventListener('touchmove', function (event) {
-    getTouch (event)
+    console.log(event)
+    //getTouch (event)
 }, false);
 
 window.addEventListener('touchend', function (event) {
@@ -524,7 +525,7 @@ function getTouch (event) {
     for (let i = 0; i < event.touches.length; i++) {
         tpCache.push(e[i].target.id)
     }
-    console.log(tpCache)
+    //console.log(tpCache)
 }
 
 

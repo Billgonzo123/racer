@@ -76,14 +76,43 @@ body {
     top:70%;
 }
 button{
+    position:fixed;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 100%;
+    border-radius: 150px;
     opacity: .5;
     font-size: xx-large;
-    width: 20vw;
-    height: 20vh;
+    width: 15vw;
+    height: 30vh;
     margin: 2vw;
     min-height: 60px;
 }
 
 button:active {
     opacity: 1;
+}
+
+
+#leftBtn{
+background-image: url(./img/left-button.png);
+top: 60%;
+
+
+}
+#rightBtn{
+    background-image: url(./img/right-button.png);
+    top: 60%;
+    left: 20%;
+}
+#accBtn{
+    background-image: url(./img/a-button.png);
+    top: 30%;
+    left: 70%;
+    
+}
+#breakBtn{
+    background-image: url(./img/b-button.png);
+    top: 65%;
+    left: 80%;
 }

@@ -22,7 +22,7 @@ const engSnd = audioCtx.createOscillator();
 engSnd.frequency.setValueAtTime(0, audioCtx.currentTime); // value in hertz
 engSnd.type = 'square';
 const engGain = audioCtx.createGain();
-engGain.gain.value = .2;
+engGain.gain.value = .15;
 engSnd.connect(engGain);
 engGain.connect(audioCtx.destination);
 engSnd.start();
@@ -233,7 +233,7 @@ function loop() {
             if (speed > 0) {
                 carD = -1;
                 playerCurve -= (.015);
-                if (c > .2 && speed > 160) tireGain.gain.value = .2;
+                if (c > .2 && speed > 160) tireGain.gain.value = .1;
             }
         } else {
             if (!keysPressed.includes('arrowright') && tpCache.includes('rightBtn') && !keysPressed.includes('x')) {
@@ -245,7 +245,7 @@ function loop() {
             if (speed > 0) {
                 carD = 1;
                 playerCurve += (.015);
-                if (c > .2 && speed > 160) tireGain.gain.value = .2;
+                if (c > .2 && speed > 160) tireGain.gain.value = .1
             }
         } else {
             if (!keysPressed.includes('arrowleft') && tpCache.includes('leftBtn') && !keysPressed.includes('x')) {
@@ -508,7 +508,7 @@ function loop() {
              const CPUdComp = CPUd - 1590;
             const CPUgear = (CPUspeed >= 181) ? (CPUspeed/1064 ) : CPUacc;
             if  ((CPUdComp-carDistance < 3000) && (CPUdComp-carDistance > -3000) && CPUspeed>0) {
-                CPUGain.gain.value = .2 - Math.abs((CPUdComp-carDistance)/15000);
+                CPUGain.gain.value = .1 - Math.abs((CPUdComp-carDistance)/30000);
                 CPUSnd.frequency.setValueAtTime((CPUspeed * 3 * CPUgear)- Math.abs((CPUdComp-carDistance)/100), audioCtx.currentTime); // value in hertz
             } else {
                 CPUSnd.frequency.setValueAtTime(0, audioCtx.currentTime); // value in hertz

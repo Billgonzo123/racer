@@ -166,6 +166,7 @@ function loop() {
         //console.log(keysPressed)
         let carPosH = (playerCurve - trackCurve);
         var time = Date.now();
+        if (hold>100)  initTime = Date.now();
         seconds = ((time - initTime) / 1000);
         frame++;
         //frame rate counter and timer

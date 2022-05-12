@@ -56,7 +56,7 @@ tireSnd.start()
 const lapEl = document.getElementById('lapTimes');
 let newLapTime = 0;
 let lapAcc = 0;
-let hold = 100;
+let hold = 400;
 //---------Game Vars--------//
 let keysPressed = [];
 let carDistance = 0;

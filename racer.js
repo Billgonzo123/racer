@@ -18,22 +18,28 @@ document.getElementById('game-container').style.transform = `scale(${init_scale}
 
 // create Oscillator(s) node
 // Engine 
+var biquadFilter = audioCtx.createBiquadFilter();
+biquadFilter.type = "highpass";
+biquadFilter.frequency.value = 80;
+
+biquadFilter.connect(audioCtx.destination)
+
 const engSnd = audioCtx.createOscillator();
 engSnd.frequency.setValueAtTime(0, audioCtx.currentTime); // value in hertz
-engSnd.type = 'square';
+engSnd.type = 'triangle';
 const engGain = audioCtx.createGain();
-engGain.gain.value = .15;
+engGain.gain.value = .6;
 engSnd.connect(engGain);
-engGain.connect(audioCtx.destination);
+engGain.connect(biquadFilter);
 engSnd.start();
 // CpuEngine 
 const CPUSnd = audioCtx.createOscillator();
 CPUSnd.frequency.setValueAtTime(0, audioCtx.currentTime); // value in hertz
-CPUSnd.type = 'sawtooth';
+CPUSnd.type = 'triangle';
 const CPUGain = audioCtx.createGain();
 CPUGain.gain.value = .2;
 CPUSnd.connect(CPUGain);
-CPUGain.connect(audioCtx.destination);
+CPUGain.connect(biquadFilter);
 CPUSnd.start();
 
 // Tire skreach
@@ -41,7 +47,7 @@ const tireSnd = audioCtx.createOscillator();
 tireSnd.frequency.setValueAtTime(0, audioCtx.currentTime); // value in hertz
 tireSnd.type = 'sine';
 const tireGain = audioCtx.createGain();
-tireGain.gain.value = 1;
+tireGain.gain.value = .3;
 tireSnd.connect(tireGain);
 tireGain.connect(audioCtx.destination);
 tireSnd.start()
@@ -50,7 +56,7 @@ tireSnd.start()
 const lapEl = document.getElementById('lapTimes');
 let newLapTime = 0;
 let lapAcc = 0;
-let hold = 400;
+let hold = 100;
 //---------Game Vars--------//
 let keysPressed = [];
 let carDistance = 0;
@@ -500,7 +506,7 @@ function loop() {
             //--------Sounds--------//
             //----------------------//
             const gear = (speed >= 181) ? (speed / 1064) : acc;
-            engSnd.frequency.setValueAtTime(speed * 3 * gear, audioCtx.currentTime); // value in hertz
+            engSnd.frequency.setValueAtTime((speed * 3 * gear), audioCtx.currentTime); // value in hertz
 
             const tireFeq = (Math.floor(carDistance) % 2)
             tireSnd.frequency.setValueAtTime(920 + (50 * tireFeq), audioCtx.currentTime)
@@ -508,8 +514,8 @@ function loop() {
              const CPUdComp = CPUd - 1590;
             const CPUgear = (CPUspeed >= 181) ? (CPUspeed/1064 ) : CPUacc;
             if  ((CPUdComp-carDistance < 3000) && (CPUdComp-carDistance > -3000) && CPUspeed>0) {
-                CPUGain.gain.value = .1 - Math.abs((CPUdComp-carDistance)/30000);
-                CPUSnd.frequency.setValueAtTime((CPUspeed * 3 * CPUgear)- Math.abs((CPUdComp-carDistance)/100), audioCtx.currentTime); // value in hertz
+                CPUGain.gain.value = .3 - Math.abs((CPUdComp-carDistance)/10000);
+                CPUSnd.frequency.setValueAtTime(30+(CPUspeed * 3 * CPUgear)- Math.abs((CPUdComp-carDistance)/1000), audioCtx.currentTime); // value in hertz
             } else {
                 CPUSnd.frequency.setValueAtTime(0, audioCtx.currentTime); // value in hertz
             }

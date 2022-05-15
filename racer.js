@@ -1,3 +1,4 @@
+
 // create web audio api context
 let audioCtx
 try {
@@ -56,7 +57,7 @@ tireSnd.start()
 const lapEl = document.getElementById('lapTimes');
 let newLapTime = 0;
 let lapAcc = 0;
-let hold = 100;
+let hold = 400;
 //---------Game Vars--------//
 let keysPressed = [];
 let carDistance = 0;
@@ -67,6 +68,7 @@ let trackCurve = 0;
 let targetCurve = 0;
 let playerCurve = .2;
 let lap = 1;
+const laps = 3;
 let position = 2;
 let carX = 0;
 let carY = 0;
@@ -112,20 +114,14 @@ var frame = 0;
 let halfImage = [];
 
 let hillArray = [];
-// set track sections [curvatrue, dist]
-const trackArray = [
-    [0, 30000],
-    [.5, 20000],
-    [0, 5000],
-    [-1, 20000],
-    [0.5, 20000],
-    [1.5, 10000],
-    [0, 90000],
-    [-.9, 12000],
-    [1, 15000],
-    [0, 30000],
+if (localStorage.getItem("currentTrack") === null || localStorage.getItem("currentTrack")>tracks.length-1) {
+    localStorage.setItem('currentTrack', 0);
+  }
+  let currentTrack = localStorage.getItem("currentTrack");
 
-];
+// set track sections [curvatrue, dist]
+const trackArray = tracks[currentTrack];
+
 //get total length of track
 let trackLength = 0;
 for (let i = 0; i < trackArray.length; i++) {
@@ -160,7 +156,7 @@ function run() {
 }
 
 function loop() {
-    setInterval(() => {
+    const gameLoop = setInterval(() => {
         //check screen size
         if (screenSize !== window.innerWidth) {
             screenSize = window.innerWidth;
@@ -305,17 +301,25 @@ function loop() {
         //find the target track curve for CPU after fi
         let CPUtargetCurve = trackArray[CPUtrackSection - 1][0];
         if (CPUspeed > 160) CPUspeed -= Math.abs(CPUtargetCurve / 3);//slow CPU down on curvs
-
-
         //if you cross the finish line
         if (trackSection === trackArray.length && carDistance > offSet) {
+       
             const lapTime = document.createElement('li');
             newLapTime = seconds - lapAcc;
             lapAcc += newLapTime;
             lapEl.appendChild(lapTime);
             lapTime.textContent = `Lap ${lap}: ${Math.round(1000 * newLapTime) / 1000}s`;
             carDistance = 0;
-            lap++;
+            if (lap === laps) {
+                lap = 0;
+                localStorage.setItem('currentTrack', parseInt(currentTrack)+1);
+                clearInterval(gameLoop)
+                audioCtx.close();
+                setTimeout(() => window.location.reload(), 4000)
+            } else {
+                lap++;
+            } 
+            
         }
         //find the target track curve after finding trackSection index
         targetCurve = trackArray[trackSection - 1][0];
@@ -413,7 +417,7 @@ function loop() {
 
             switch (true) {
                 case (CPUspeed < 45):
-                    CPUacc = .42;
+                    CPUacc = .45;
                     break;
                 case (CPUspeed >= 45 && CPUspeed < 80):
                     CPUacc = .35;
@@ -428,7 +432,7 @@ function loop() {
                     CPUacc = .16;
                     break;
                 case (CPUspeed >= 210 && CPUspeed < 219):
-                    CPUacc = .10;
+                    CPUacc = .11;
                     break;
                 case (CPUspeed >= 219 && CPUspeed < 255):
                     CPUacc = .085;
@@ -472,7 +476,10 @@ function loop() {
             ctx.fillRect(Math.round((carDistance / trackLength) * 160), 1, 4, 2)
             ctx.fillStyle = "red";
             ctx.fillRect(Math.round(((CPUd - 1590) / trackLength) * 160), 4, 4, 2)
-
+            if (!lap) {
+                ctx.font = "12px tiny";
+                ctx.fillText("Finish!",45,50);
+            }
             if (hold>0){
                 hold--;
                 const image = new Image();
@@ -496,11 +503,13 @@ function loop() {
             //        Draw Hud          //
             //--------------------------//
 
-            hudEl.innerHTML = `Lap: ${lap} |
-        Pos: ${position}${(position === 1) ? "st" : "nd"} |
-        Time: ${Math.round(seconds)}sec |
-        Speed: ${Math.round(speed)}mph
-        `
+            hudEl.innerHTML = `
+            Track: ${parseInt(currentTrack)+1} |
+            Lap: ${lap}/${laps} |
+            Pos: ${position}${(position === 1) ? "st" : "nd"} |
+            Time: ${Math.round(seconds)}sec`
+            +"<br /><br/>"+
+            `Speed: ${Math.round(speed)}mph`
 
             //----------------------//
             //--------Sounds--------//
@@ -560,7 +569,7 @@ window.addEventListener('touchstart', function (event) {
     getTouch(event)
 }, false);
 window.addEventListener('touchmove', function (event) {
-    console.log(event)
+ 
     //getTouch (event)
 }, false);
 

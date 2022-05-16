@@ -80,7 +80,7 @@ let CPUy = 0;
 let CPUx = -20; //Between -50 and 50. 0 is center track
 let CPUp = 0; //CPU H-Position
 let CPUcurve = CPUx / 35
-let CPUd = 1590; //cpu distance -must have this offset for some reason
+let CPUd = 1587; //cpu distance -must have this offset for some reason
 let CPUtd = 0; //CPU
 let CPUspeed = 0;
 let CPUacc = 0;
@@ -95,6 +95,7 @@ const upImage = new Image();
 upImage.src = './img/up.png';
 const CPUImage = new Image();
 CPUImage.src = './img/CPU_1.png';
+let turnSign = new Image(); //turn sign
 //create a color variable
 let color = [255, 0, 0];
 
@@ -114,12 +115,12 @@ var frame = 0;
 let halfImage = [];
 
 let hillArray = [];
-if (localStorage.getItem("currentTrack") === null || localStorage.getItem("currentTrack")>tracks.length-1) {
+if (localStorage.getItem("currentTrack") === null || localStorage.getItem("currentTrack") > tracks.length - 1) {
     localStorage.setItem('currentTrack', 0);
-  }
-  let currentTrack = localStorage.getItem("currentTrack");
+}
+let currentTrack = localStorage.getItem("currentTrack");
 
-// set track sections [curvatrue, dist]
+// Get track sections from current track
 const trackArray = tracks[currentTrack];
 
 //get total length of track
@@ -150,7 +151,7 @@ function run() {
         halfImage = imgArray.splice(-half)
         //convert the array back to Uint8ClampedArray
         //doing so hear has HUGe performance gains in Chrome
-        halfImage = new Uint8ClampedArray(halfImage)  
+        halfImage = new Uint8ClampedArray(halfImage)
         window.requestAnimationFrame(loop)
     }
 }
@@ -168,7 +169,7 @@ function loop() {
         //console.log(keysPressed)
         let carPosH = (playerCurve - trackCurve);
         var time = Date.now();
-        if (hold>100)  initTime = Date.now();
+        if (hold > 100) initTime = Date.now();
         seconds = ((time - initTime) / 1000);
         frame++;
         //frame rate counter and timer
@@ -181,6 +182,99 @@ function loop() {
         //--------------------------//
         //   Pre-draw calculations  //
         //--------------------------//
+
+           //-----------------------------------------//
+        //keep track of the section of track we are on
+        //----------------------------------------//
+        let offSet = 0;
+        let trackSection = 0;
+        //find the current track section based off the car distance
+        //will result in trackSection-1 being the desired index
+        while (trackSection < trackArray.length && offSet <= carDistance) {
+            offSet += trackArray[trackSection][1];
+            trackSection++;
+        }
+        //set turn sign sprite based off next turn
+        const curTurn = trackArray[trackSection - 1][0];
+        const curLength =trackArray[trackSection - 1][1]
+     
+
+        switch (trackSection < trackArray.length) {
+            case (curTurn > 0 && curTurn < .5):
+                turnSign.src = './img/softRight.png'
+                break;
+            case (curTurn < 0 && curTurn > -.5):
+                turnSign.src = './img/softLeft.png'
+                break;
+
+            case (curTurn >= .5 && curTurn <= 1 && curLength < 20000):
+                turnSign.src = './img/softRight.png'
+                break;
+            case (curTurn <= -.5 && curTurn >= -1 && curLength < 20000):
+                turnSign.src = './img/softLeft.png'
+                break;
+
+            case (curTurn >= .5 && curTurn <= 1 && curLength >= 20000):
+                turnSign.src = './img/hardRight.png'
+                break;
+            case (curTurn <= -.5 && curTurn >= -1 && curLength >= 20000):
+                turnSign.src = './img/hardLeft.png'
+                break;
+            case (curTurn > 1 ):
+                turnSign.src = './img/utrunRight.png'
+                break;
+            case (curTurn < -1 ):
+                turnSign.src = './img/uturnLeft.png'
+                break;
+
+
+            default: turnSign.src = './img/blank.png'
+        }
+
+        //------Get CPU position on track-----------//
+        let CPUoffset = 0;
+        let CPUtrackSection = 0;
+        while (CPUtrackSection < trackArray.length && CPUoffset <= CPUd) {
+            CPUoffset += trackArray[CPUtrackSection][1];
+            CPUtrackSection++;
+        }
+        //find the target track curve for CPU after fi
+        let CPUtargetCurve = trackArray[CPUtrackSection - 1][0];
+        if (CPUspeed > 190 && CPUtargetCurve<=1) CPUspeed -=  Math.abs(CPUtargetCurve/2);//slow CPU down on curvs
+        if (CPUspeed > 68 && CPUtargetCurve>1) CPUspeed -=  Math.abs(CPUtargetCurve*2);//slow CPU down on curvs
+
+        //if you cross the finish line
+      //  speed=CPUspeed
+        if (trackSection === trackArray.length && carDistance > offSet) {
+
+            const lapTime = document.createElement('li');
+            newLapTime = seconds - lapAcc;
+            lapAcc += newLapTime;
+            lapEl.appendChild(lapTime);
+            lapTime.textContent = `Lap ${lap}: ${Math.round(1000 * newLapTime) / 1000}s`;
+            carDistance = 0;
+            if (lap === laps) {
+                lap = 0;
+                localStorage.setItem('currentTrack', parseInt(currentTrack) + 1);
+                clearInterval(gameLoop)
+                audioCtx.close();
+                setTimeout(() => window.location.reload(), 4000)
+            } else {
+                lap++;
+            }
+
+        }
+        //find the target track curve after finding trackSection index
+        targetCurve = trackArray[trackSection - 1][0];
+        const curveDiff = (targetCurve - currentCurve) * (speed / 14000);
+        currentCurve += curveDiff;
+
+        //change this float to adjust how hard the car is pushed in the opposite direction of the curve
+        trackCurve += currentCurve * (.00019 * (speed));
+
+        //--------------------------//
+        //----------Inputs---------//
+        //-------------------------//
 
         if (keysPressed.includes('z') || tpCache.includes('accBtn')) {
             switch (true) {
@@ -211,14 +305,17 @@ function loop() {
                 default:
                     acc = .25
             }
-           if (hold<100)  speed += acc;
+            if (hold < 100) speed += acc;
 
         } else {
             speed -= 0.1;
         }
+     
         //accelerate CPU and lower acc on curves
-        if (hold<100)  CPUspeed += CPUacc - Math.abs(currentCurve / 10)
+        if (hold < 100) CPUspeed += CPUacc;
 
+
+        //zeroe the tire sounds gain
         tireGain.gain.value = 0;
 
         if (keysPressed.includes('x') || tpCache.includes('breakBtn')) {
@@ -281,55 +378,7 @@ function loop() {
         //keep track of how far car has traveled
         carDistance += speed;
         totalDistance += speed;
-        //-----------------------------------------//
-        //keep track of the section of track we are on
-        //----------------------------------------//
-        let offSet = 0;
-        let trackSection = 0;
-        //find the current track section based off the car distance
-        //will result in trackSection-1 being the desired index
-        while (trackSection < trackArray.length && offSet <= carDistance) {
-            offSet += trackArray[trackSection][1];
-            trackSection++;
-        }
-        let CPUoffset = 0;
-        let CPUtrackSection = 0;
-        while (CPUtrackSection < trackArray.length && CPUoffset <= CPUd) {
-            CPUoffset += trackArray[CPUtrackSection][1];
-            CPUtrackSection++;
-        }
-        //find the target track curve for CPU after fi
-        let CPUtargetCurve = trackArray[CPUtrackSection - 1][0];
-        if (CPUspeed > 160) CPUspeed -= Math.abs(CPUtargetCurve / 3);//slow CPU down on curvs
-        //if you cross the finish line
-        if (trackSection === trackArray.length && carDistance > offSet) {
-       
-            const lapTime = document.createElement('li');
-            newLapTime = seconds - lapAcc;
-            lapAcc += newLapTime;
-            lapEl.appendChild(lapTime);
-            lapTime.textContent = `Lap ${lap}: ${Math.round(1000 * newLapTime) / 1000}s`;
-            carDistance = 0;
-            if (lap === laps) {
-                lap = 0;
-                localStorage.setItem('currentTrack', parseInt(currentTrack)+1);
-                clearInterval(gameLoop)
-                audioCtx.close();
-                setTimeout(() => window.location.reload(), 4000)
-            } else {
-                lap++;
-            } 
-            
-        }
-        //find the target track curve after finding trackSection index
-        targetCurve = trackArray[trackSection - 1][0];
-        const curveDiff = (targetCurve - currentCurve) * (speed / 14000);
-        currentCurve += curveDiff;
-
-
-
-        //change this float to adjust how hard the car is pushed in the opposite direction of the curve
-        trackCurve += currentCurve * (.00019 * (speed));
+     
 
         //car positions
 
@@ -408,7 +457,7 @@ function loop() {
             const addSpd = Math.round(1000 * CPUspeed) / 1000;
             CPUd += addSpd; //Add current track distance
             CPUtd += addSpd; //add to total distance CPU
-            if (CPUtd < totalDistance) {
+            if ((CPUtd - 1) < totalDistance) {
                 position = 1;
             } else {
                 position = 2;
@@ -429,16 +478,16 @@ function loop() {
                     CPUacc = .21;
                     break;
                 case (CPUspeed >= 181 && CPUspeed < 210):
-                    CPUacc = .16;
+                    CPUacc = .17;
                     break;
                 case (CPUspeed >= 210 && CPUspeed < 219):
-                    CPUacc = .11;
+                    CPUacc = .115;
                     break;
                 case (CPUspeed >= 219 && CPUspeed < 255):
-                    CPUacc = .085;
+                    CPUacc = .1;
                     break;
                 case (CPUspeed >= 255):
-                    CPUacc = 0;
+                    CPUacc = .0205;
                     break;
                 default:
                     CPUacc = .25
@@ -469,34 +518,39 @@ function loop() {
                 renderPlyr();
                 renderCPU();
             }
+            //draw relative car positions
             ctx.fillStyle = '#00000055';
             ctx.fillRect(0, 1, 160, 2)
             ctx.fillRect(0, 4, 160, 2)
             ctx.fillStyle = "blue";
             ctx.fillRect(Math.round((carDistance / trackLength) * 160), 1, 4, 2)
             ctx.fillStyle = "red";
-            ctx.fillRect(Math.round(((CPUd - 1590) / trackLength) * 160), 4, 4, 2)
+            ctx.fillRect(Math.round(((CPUd - 1587) / trackLength) * 160), 4, 4, 2)
+
+            //drawTurnSign
+            ctx.drawImage(turnSign, w / 2 - 16, 10)
+
             if (!lap) {
                 ctx.font = "12px tiny";
-                ctx.fillText("Finish!",45,50);
+                ctx.fillText("Finish!", 45, 50);
             }
-            if (hold>0){
+            if (hold > 0) {
                 hold--;
                 const image = new Image();
                 let lightColor = '';
-                switch(true) {
-                    case (hold > 300):  lightColor = './img/red.png'
-                    break;
+                switch (true) {
+                    case (hold > 300): lightColor = './img/red.png'
+                        break;
                     case (hold > 200): lightColor = './img/orange.png'
-                    break;
+                        break;
                     case (hold > 100): lightColor = './img/yellow.png'
-                    break;
+                        break;
                     case (hold > 0): lightColor = './img/green.png'
-                    break;
+                        break;
                 }
-              
-            image.src = lightColor;
-            ctx.drawImage(image, w / 2 - 6, h / 2 - 16)
+
+                image.src = lightColor;
+                ctx.drawImage(image, w / 2 - 6, h / 2 - 16)
             }
 
             //--------------------------//
@@ -504,12 +558,12 @@ function loop() {
             //--------------------------//
 
             hudEl.innerHTML = `
-            Track: ${parseInt(currentTrack)+1} |
+            Track: ${parseInt(currentTrack) + 1} |
             Lap: ${lap}/${laps} |
             Pos: ${position}${(position === 1) ? "st" : "nd"} |
             Time: ${Math.round(seconds)}sec`
-            +"<br /><br/>"+
-            `Speed: ${Math.round(speed)}mph`
+                + "<br /><br/>" +
+                `Speed: ${Math.round(speed)}mph`
 
             //----------------------//
             //--------Sounds--------//
@@ -519,16 +573,16 @@ function loop() {
 
             const tireFeq = (Math.floor(carDistance) % 2)
             tireSnd.frequency.setValueAtTime(920 + (50 * tireFeq), audioCtx.currentTime)
-             ///cpu sound
-             const CPUdComp = CPUd - 1590;
-            const CPUgear = (CPUspeed >= 181) ? (CPUspeed/1064 ) : CPUacc;
-            if  ((CPUdComp-carDistance < 3000) && (CPUdComp-carDistance > -3000) && CPUspeed>0) {
-                CPUGain.gain.value = .3 - Math.abs((CPUdComp-carDistance)/10000);
-                CPUSnd.frequency.setValueAtTime(30+(CPUspeed * 3 * CPUgear)- Math.abs((CPUdComp-carDistance)/1000), audioCtx.currentTime); // value in hertz
+            ///cpu sound
+            const CPUdComp = CPUd - 1587;
+            const CPUgear = (CPUspeed >= 181) ? (CPUspeed / 1064) : CPUacc;
+            if ((CPUdComp - carDistance < 3000) && (CPUdComp - carDistance > -3000) && CPUspeed > 0) {
+                CPUGain.gain.value = .3 - Math.abs((CPUdComp - carDistance) / 10000);
+                CPUSnd.frequency.setValueAtTime(30 + (CPUspeed * 3 * CPUgear) - Math.abs((CPUdComp - carDistance) / 1000), audioCtx.currentTime); // value in hertz
             } else {
                 CPUSnd.frequency.setValueAtTime(0, audioCtx.currentTime); // value in hertz
             }
-            
+
         };
 
     }, 1000 / 60)
@@ -540,7 +594,7 @@ const logKeyDown = (e) => {
     audioCtx.resume();//must resume audio context with user input
     if (!keysPressed.includes(e.key)) keysPressed = [...keysPressed, e.key.toLowerCase()];
     //console.log(keysPressed)
-    
+
 };
 
 const logKeyUp = (e) => {
@@ -565,11 +619,11 @@ if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(naviga
 
 
 window.addEventListener('touchstart', function (event) {
-    
+
     getTouch(event)
 }, false);
 window.addEventListener('touchmove', function (event) {
- 
+
     //getTouch (event)
 }, false);
 

@@ -40,7 +40,7 @@ self.onmessage = (message) => {
             let circleBound = Math.sqrt(Math.pow(x - (carX + (carD * 11) + carM - 1), 2) + Math.pow(y - carY, 2));
             if (y > carY - 6 + (Math.abs(carD) * 4)) circleBound = circleBound * perspective + 15.5 - (Math.abs(carD * 3));
 
-            const l = (dk > 60 && y < carY + 3 && 31 - (Math.abs(carD)) > circleBound) ? dk : 0;
+            const l = (dk > 90 && y < carY + 3 && 31 - (Math.abs(carD)) > circleBound) ? dk : 0;
 
             // Grass color
             const grassColor = (grassSpace > 0) ?

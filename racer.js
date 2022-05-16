@@ -420,7 +420,7 @@ function loop() {
         for (y = mid; y < h; y++) {
 
             // make track calculations
-            dk = (seconds < 160) ? seconds : 160;//to darken color over time
+            dk = (seconds < 250) ? seconds : 250;//to darken color over time
 
             const perspective = (y - mid) / (mid);
 
@@ -448,7 +448,7 @@ function loop() {
                 let colorB = (y > (h) - hillHeight) ? [55 - y * perspective - (dk / 5), 155 - y * perspective - (dk / 5), 55 - y * perspective - (dk / 10)] : [100 + (y * 2) - dk, 100 - dk, 255 - dk];
                 //hill border color
                 if (y === (h) - hillHeight) colorB =
-                    [245 - dk / 1.6, 130 - dk, 230 - dk / 1.3];
+                    [245 - dk / 1.2, 130 - dk, 230 - dk / 1.3];
                 //[-80 + gY*2 * perspective + dk / 4,  -50 + gY * perspective - dk / 6, -80 + gY*2 * perspective + dk / 4];
                 //-------Set Pixel Data-------//
                 halfImage[pixelindexTop] = colorB[0];     // Red

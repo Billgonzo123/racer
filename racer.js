@@ -115,19 +115,20 @@ var frame = 0;
 let halfImage = [];
 
 let hillArray = [];
-if (localStorage.getItem("currentTrack") === null || localStorage.getItem("currentTrack") > tracks.length - 1) {
+if (localStorage.getItem("currentTrack") === null) {
     localStorage.setItem('currentTrack', 0);
+}
+if (localStorage.getItem("racingStats") === null) {
+    localStorage.setItem('racingStats', JSON.stringify([]));
 }
 let currentTrack = localStorage.getItem("currentTrack");
 
 // Get track sections from current track
 const trackArray = tracks[currentTrack];
 
-//get total length of track
+//will hold current track length
 let trackLength = 0;
-for (let i = 0; i < trackArray.length; i++) {
-    trackLength += trackArray[i][1];
-}
+
 
 function run() {
     const canvas = document.getElementById('game-window');
@@ -152,7 +153,16 @@ function run() {
         //convert the array back to Uint8ClampedArray
         //doing so hear has HUGe performance gains in Chrome
         halfImage = new Uint8ClampedArray(halfImage)
-        window.requestAnimationFrame(loop)
+        //if on filan lap run endGameScreen loop
+        if (localStorage.getItem("currentTrack") > tracks.length - 1) {
+            window.requestAnimationFrame(endGameScreen)
+        } else {
+            //get total length of track
+            for (let i = 0; i < trackArray.length; i++) {
+                trackLength += trackArray[i][1];
+            }
+            window.requestAnimationFrame(loop)
+        }
     }
 }
 
@@ -183,7 +193,7 @@ function loop() {
         //   Pre-draw calculations  //
         //--------------------------//
 
-           //-----------------------------------------//
+        //-----------------------------------------//
         //keep track of the section of track we are on
         //----------------------------------------//
         let offSet = 0;
@@ -196,8 +206,8 @@ function loop() {
         }
         //set turn sign sprite based off next turn
         const curTurn = trackArray[trackSection - 1][0];
-        const curLength =trackArray[trackSection - 1][1]
-     
+        const curLength = trackArray[trackSection - 1][1]
+
 
         switch (trackSection < trackArray.length) {
             case (curTurn > 0 && curTurn < .5):
@@ -220,10 +230,10 @@ function loop() {
             case (curTurn <= -.5 && curTurn >= -1 && curLength >= 20000):
                 turnSign.src = './img/hardLeft.png'
                 break;
-            case (curTurn > 1 ):
+            case (curTurn > 1):
                 turnSign.src = './img/utrunRight.png'
                 break;
-            case (curTurn < -1 ):
+            case (curTurn < -1):
                 turnSign.src = './img/uturnLeft.png'
                 break;
 
@@ -240,11 +250,11 @@ function loop() {
         }
         //find the target track curve for CPU after fi
         let CPUtargetCurve = trackArray[CPUtrackSection - 1][0];
-        if (CPUspeed > 190 && CPUtargetCurve<=1) CPUspeed -=  Math.abs(CPUtargetCurve/2);//slow CPU down on curvs
-        if (CPUspeed > 68 && CPUtargetCurve>1) CPUspeed -=  Math.abs(CPUtargetCurve*2);//slow CPU down on curvs
+        if (CPUspeed > 190 && CPUtargetCurve <= 1) CPUspeed -= Math.abs(CPUtargetCurve / 2);//slow CPU down on curvs
+        if (CPUspeed > 68 && CPUtargetCurve > 1) CPUspeed -= Math.abs(CPUtargetCurve * 2);//slow CPU down on curvs
 
         //if you cross the finish line
-      //  speed=CPUspeed
+        //  speed=CPUspeed
         if (trackSection === trackArray.length && carDistance > offSet) {
 
             const lapTime = document.createElement('li');
@@ -253,8 +263,21 @@ function loop() {
             lapEl.appendChild(lapTime);
             lapTime.textContent = `Lap ${lap}: ${Math.round(1000 * newLapTime) / 1000}s`;
             carDistance = 0;
+            //When you pass the finish line
             if (lap === laps) {
                 lap = 0;
+                const timesList = document.querySelectorAll('li');
+                const timesArray = [...timesList];
+                console.log(timesList[0])
+                const times = timesArray.map(e => e.outerText);
+                let stats = JSON.parse(localStorage.getItem('racingStats'));
+                let data = {
+                    position: position,
+                    times: times
+                }
+                stats.push(data)
+                localStorage.setItem('racingStats', JSON.stringify(stats));
+
                 localStorage.setItem('currentTrack', parseInt(currentTrack) + 1);
                 clearInterval(gameLoop)
                 audioCtx.close();
@@ -310,7 +333,7 @@ function loop() {
         } else {
             speed -= 0.1;
         }
-     
+
         //accelerate CPU and lower acc on curves
         if (hold < 100) CPUspeed += CPUacc;
 
@@ -378,7 +401,7 @@ function loop() {
         //keep track of how far car has traveled
         carDistance += speed;
         totalDistance += speed;
-     
+
 
         //car positions
 
@@ -587,6 +610,32 @@ function loop() {
 
     }, 1000 / 60)
 
+}
+
+//////////////------------------End Game Screen---------------/////////////
+function endGameScreen() {
+    const stats = JSON.parse(localStorage.getItem('racingStats'));
+    const totalPos = stats.map(e => e.position);
+    let finalRank = totalPos.reduce(function(accumulator, currentValue) {
+        return accumulator + currentValue;
+      }, 0);
+    finalRank = Math.round(finalRank/stats.length);
+    const contEl = document.getElementById('controls')
+    contEl.innerHTML =  `Press "Z' to restart game!`
+    hudEl.style =  'position: fixed; top: 5vh; overflow: auto; height:50vh; width: 100vw;'
+    hudEl.innerHTML =  `----------------- Rank: ${finalRank}${(finalRank === 1) ? "st" : "nd"} -----------------`
+        + "<br />" +
+        `${stats.map((e,i) => `<br/><br/>---------------------------<br/>Track: ${i+1} - Finished: ${e.position}${(e.position === 1) ? "st" : "nd"} 
+        ${e.times.map(t=> `<br/><br/>${t}`)}`)}`
+
+        setInterval(() => {
+            if (keysPressed.includes('z')) {
+                localStorage.setItem('racingStats', JSON.stringify([]));
+                localStorage.setItem('currentTrack', 0);
+                document.location.reload();
+      
+            }
+        }, 16.667)
 }
 
 /////////////Key inputs///////////////////

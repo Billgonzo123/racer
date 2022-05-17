@@ -629,7 +629,7 @@ function endGameScreen() {
         ${e.times.map(t=> `<br/><br/>${t}`)}`)}`
 
         setInterval(() => {
-            if (keysPressed.includes('z')) {
+            if (keysPressed.includes('z') || tpCache.includes('accBtn')) {
                 localStorage.setItem('racingStats', JSON.stringify([]));
                 localStorage.setItem('currentTrack', 0);
                 document.location.reload();

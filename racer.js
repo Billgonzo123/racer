@@ -343,9 +343,7 @@ function loop() {
         //accelerate CPU and lower acc on curves
         if (hold < 100) CPUspeed += CPUacc;
 
-
-        //zeroe the tire sounds gain
-       //tireGain.gain.value = 0;
+   
 
         if (keysPressed.includes('x') || tpCache.includes('breakBtn')) {
             speed -= 1;
@@ -686,7 +684,11 @@ window.addEventListener('touchmove', function (event) {
 }, false);
 
 window.addEventListener('touchend', function (event) {
+    if (event.target.id='FullScreen'){
+        toggleFullscreen()
+    } else {
     getTouch(event)
+    }
 }, false);
 
 function getTouch(event) {

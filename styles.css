@@ -135,7 +135,14 @@ button:active {
     opacity: 1;
 }
 
-
+#FullScreen{
+    background-color: white;
+    top: 0vh;
+    right:0;
+    height: 3vh;
+    width: 13vw;
+font-size:2vw;
+}
 #leftBtn{
 background-image: url(./img/left-button.png);
 top: 60%;

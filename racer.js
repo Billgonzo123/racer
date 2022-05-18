@@ -631,7 +631,7 @@ function endGameScreen() {
     finalRank = Math.round(finalRank / stats.length);
     const contEl = document.getElementById('controls')
     contEl.innerHTML = `Press "Z' to restart game!`
-    hudEl.style = 'position: fixed; top: 5vh; overflow: auto; height:50vh; width: 100vw;'
+    hudEl.style = 'position: fixed; top: 5vh; overflow: auto; height:80%; width: 70%;'
     hudEl.innerHTML = `----------------- Rank: ${finalRank}${(finalRank === 1) ? "st" : "nd"} -----------------`
         + "<br />" +
         `${stats.map((e, i) => `<br/><br/>---------------------------<br/>Track: ${i + 1} - Finished: ${e.position}${(e.position === 1) ? "st" : "nd"} 

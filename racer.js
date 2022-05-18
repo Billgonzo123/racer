@@ -137,13 +137,19 @@ function run() {
         w = canvas.width;
         h = canvas.height;
         mid = h / 2;
-        //preCalculate hills (currently turned off)
+        //preCalculate hills 
         for (let i = 0; i < 10000; i++) {
-            const hillX = Math.floor(Math.abs(Math.sin(i * 0.01 + trackCurve) * 16.0));
-            hillArray.push(hillX)
+            let hillY = 0;
+            if (currentTrack % 2) {
+                hillY = Math.floor(Math.abs(Math.sin(i * 0.01) * 16.0));
+            } else {
+                hillY = Math.floor(Math.abs(Math.sin(i * 0.01) * Math.sin(i * 0.02) * 30.0))
+            }
+
+            hillArray.push(hillY)
 
         }
-
+        console.log(hillArray)
         imageData = ctx.createImageData(w, h)
 
         const half = 32000;
@@ -339,7 +345,7 @@ function loop() {
 
 
         //zeroe the tire sounds gain
-        tireGain.gain.value = 0;
+       //tireGain.gain.value = 0;
 
         if (keysPressed.includes('x') || tpCache.includes('breakBtn')) {
             speed -= 1;
@@ -444,7 +450,10 @@ function loop() {
                 ///Draw  Top (hills and sky)//
                 //--------------------------//
                 hillHeight = hillArray[5000 + Math.round(x + 100 * trackCurve)]
+
                 const pixelindexTop = (((y - (mid)) * w + x) * 4);//Find RGBA pixel index for imageData
+
+
                 let colorB = (y > (h) - hillHeight) ? [55 - y * perspective - (dk / 5), 155 - y * perspective - (dk / 5), 55 - y * perspective - (dk / 10)] : [100 + (y * 2) - dk, 100 - dk, 255 - dk];
                 //hill border color
                 if (y === (h) - hillHeight) colorB =
@@ -616,26 +625,26 @@ function loop() {
 function endGameScreen() {
     const stats = JSON.parse(localStorage.getItem('racingStats'));
     const totalPos = stats.map(e => e.position);
-    let finalRank = totalPos.reduce(function(accumulator, currentValue) {
+    let finalRank = totalPos.reduce(function (accumulator, currentValue) {
         return accumulator + currentValue;
-      }, 0);
-    finalRank = Math.round(finalRank/stats.length);
+    }, 0);
+    finalRank = Math.round(finalRank / stats.length);
     const contEl = document.getElementById('controls')
-    contEl.innerHTML =  `Press "Z' to restart game!`
-    hudEl.style =  'position: fixed; top: 5vh; overflow: auto; height:50vh; width: 100vw;'
-    hudEl.innerHTML =  `----------------- Rank: ${finalRank}${(finalRank === 1) ? "st" : "nd"} -----------------`
+    contEl.innerHTML = `Press "Z' to restart game!`
+    hudEl.style = 'position: fixed; top: 5vh; overflow: auto; height:50vh; width: 100vw;'
+    hudEl.innerHTML = `----------------- Rank: ${finalRank}${(finalRank === 1) ? "st" : "nd"} -----------------`
         + "<br />" +
-        `${stats.map((e,i) => `<br/><br/>---------------------------<br/>Track: ${i+1} - Finished: ${e.position}${(e.position === 1) ? "st" : "nd"} 
-        ${e.times.map(t=> `<br/><br/>${t}`)}`)}`
+        `${stats.map((e, i) => `<br/><br/>---------------------------<br/>Track: ${i + 1} - Finished: ${e.position}${(e.position === 1) ? "st" : "nd"} 
+        ${e.times.map(t => `<br/><br/>${t}`)}`)}`
 
-        setInterval(() => {
-            if (keysPressed.includes('z') || tpCache.includes('accBtn')) {
-                localStorage.setItem('racingStats', JSON.stringify([]));
-                localStorage.setItem('currentTrack', 0);
-                document.location.reload();
-      
-            }
-        }, 16.667)
+    setInterval(() => {
+        if (keysPressed.includes('z') || tpCache.includes('accBtn')) {
+            localStorage.setItem('racingStats', JSON.stringify([]));
+            localStorage.setItem('currentTrack', 0);
+            document.location.reload();
+
+        }
+    }, 16.667)
 }
 
 /////////////Key inputs///////////////////

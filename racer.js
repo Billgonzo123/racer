@@ -684,7 +684,8 @@ window.addEventListener('touchmove', function (event) {
 }, false);
 
 window.addEventListener('touchend', function (event) {
-    if (event.target.id='FullScreen'){
+
+    if (event.target.id==='FullScreen'){
         toggleFullscreen()
     } else {
     getTouch(event)

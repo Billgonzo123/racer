@@ -134,6 +134,7 @@ function run() {
     const canvas = document.getElementById('game-window');
     if (canvas.getContext) {
         ctx = canvas.getContext('2d', { alpha: false });
+        ctx.imageSmoothingEnabled = false;
         w = canvas.width;
         h = canvas.height;
         mid = h / 2;

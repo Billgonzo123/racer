@@ -2,6 +2,7 @@
 self.onmessage = (message) => {
  
     let { halfImage, w, h, mid, seconds, currentCurve, carDistance, trackLength, carD, carX, carY,  carM } = message.data
+   let newImage = halfImage;
     let color = [255,0,0]
     //--------------------------//
     //      Begin Draw          //
@@ -63,12 +64,12 @@ self.onmessage = (message) => {
 
             
             //--------Set Pixel Data---------//
-            halfImage[pixelindex] = color[0]      // Red
-            halfImage[pixelindex + 1] = color[1]  // Green
-            halfImage[pixelindex + 2] = color[2]   // Blue
-            halfImage[pixelindex + 3] = 255;   // Alpha
+            newImage[pixelindex] = color[0]      // Red
+            newImage[pixelindex + 1] = color[1]  // Green
+            newImage[pixelindex + 2] = color[2]   // Blue
+            newImage[pixelindex + 3] = 255;   // Alpha
         }
     }
-    postMessage(halfImage)
+    postMessage(newImage)
 }
 

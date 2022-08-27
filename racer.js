@@ -423,7 +423,7 @@ function loop() {
         //      Begin Draw          //
         //--------------------------//
         for (y = mid; y < h; y++) {
-
+            
             // make track calculations
             dk = (seconds < 250) ? seconds : 250;//to darken color over time
 
@@ -474,11 +474,14 @@ function loop() {
 
             imageData.data.set(halfImage);
 
-            ctx.putImageData(imageData, 0, 0);
-
+            ctx.putImageData(imageData, 0, 1);
             imageData.data.set(event.data);
 
             ctx.putImageData(imageData, 0, mid);
+
+
+
+
 
 
             //-------------------------//

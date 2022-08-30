@@ -81,7 +81,7 @@ let CPUx = -20; //Between -50 and 50. 0 is center track
 let CPUp = 0; //CPU H-Position
 let CPUcurve = CPUx / 35
 let CPUd = 1587; //cpu distance -must have this offset for some reason
-let CPUtd = 0; //CPU
+let CPUtd = 0; //CPU total distance traveled
 let CPUspeed = 0;
 let CPUacc = 0;
 let maxSpd = 160;
@@ -131,6 +131,7 @@ let trackLength = 0;
 
 
 function run() {
+ 
     const canvas = document.getElementById('game-window');
     if (canvas.getContext) {
         ctx = canvas.getContext('2d', { alpha: false });
@@ -255,8 +256,10 @@ function loop() {
         }
         //find the target track curve for CPU after fi
         let CPUtargetCurve = trackArray[CPUtrackSection - 1][0];
-        if (CPUspeed > 190 && CPUtargetCurve <= 1) CPUspeed -= Math.abs(CPUtargetCurve / 2);//slow CPU down on curvs
-        if (CPUspeed > 68 && CPUtargetCurve > 1) CPUspeed -= Math.abs(CPUtargetCurve * 2);//slow CPU down on curvs
+        if (CPUspeed > 245 && Math.abs(CPUtargetCurve) <= 1) CPUspeed -= Math.abs(Math.abs(CPUtargetCurve)*5);//slow CPU down on curvs
+        if (CPUspeed > 78 && Math.abs(CPUtargetCurve) > 1) CPUspeed -= 10 ;//slow CPU down on curvs
+
+        //console.log('CPU Speed:', Math.round(CPUspeed) , CPUtargetCurve )
 
         //if you cross the finish line
         //  speed=CPUspeed
@@ -475,11 +478,6 @@ function loop() {
             imageData.data.set(event.data);
 
             ctx.putImageData(imageData, 0, mid);
-
-
-
-
-
 
             //-------------------------//
             //----Calculate CPU scale and speed-------//

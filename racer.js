@@ -150,7 +150,7 @@ function run() {
             hillArray.push(hillY)
 
         }
-        console.log(hillArray)
+  
         imageData = ctx.createImageData(w, h)
 
         const half = 32000;
@@ -183,7 +183,7 @@ function loop() {
 
         }
 
-        //console.log(keysPressed)
+   
         let carPosH = (playerCurve - trackCurve);
         var time = Date.now();
         if (hold > 100) initTime = Date.now();
@@ -191,8 +191,6 @@ function loop() {
         frame++;
         //frame rate counter and timer
         if (time - startTime > 1000) {
-            //console.clear();
-            //console.log('FPS:', (frame / ((time - startTime) / 1000)).toFixed(1));
             startTime = time;
             frame = 0;
         }
@@ -275,7 +273,6 @@ function loop() {
                 lap = 0;
                 const timesList = document.querySelectorAll('li');
                 const timesArray = [...timesList];
-                console.log(timesList[0])
                 const times = timesArray.map(e => e.outerText);
                 let stats = JSON.parse(localStorage.getItem('racingStats'));
                 let data = {
@@ -653,14 +650,11 @@ function endGameScreen() {
 const logKeyDown = (e) => {
     audioCtx.resume();//must resume audio context with user input
     if (!keysPressed.includes(e.key)) keysPressed = [...keysPressed, e.key.toLowerCase()];
-    //console.log(keysPressed)
-
 };
 
 const logKeyUp = (e) => {
     const newKeys = keysPressed.filter((key) => key !== e.key.toLowerCase());
     if (newKeys !== keysPressed) keysPressed = newKeys;
-    //console.log(keysPressed)
 };
 
 
@@ -703,7 +697,6 @@ function getTouch(event) {
     for (let i = 0; i < event.touches.length; i++) {
         tpCache.push(e[i].target.id)
     }
-    //console.log(tpCache)
 }
 
 

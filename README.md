@@ -14,8 +14,10 @@ This is a retro arcade style racer in the vein of Pol Position. Race against a C
 - 4 unique tracks
 
 ## Controls  
-Left/Right Arrows ---- Turn Left or Right  
-Z/X ------------------ Accelerate and Break respectively
+| Key(s) | Action |  
+| :-------------: | :-------------:  
+| Left/Right Arrows | Turn Left or Right |  
+| Z/X | Accelerate and Break respectively |  
 
 ## Engine Details
 The inspiration behind this project was to build something that worked like a retro game engine. To me, this means tile based or pixel rasterization; I chose the ladder.  Unfortunately, calculating each pixel individually has some serious performance drawbacks, especially in an interpreted language like JS. To overcome these performance limitations I did 3 things:

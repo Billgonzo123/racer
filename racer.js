@@ -398,7 +398,7 @@ function loop() {
         //----------------------------------------------//
         //if you are outside the track, force slow down //
         //----------------------------------------------//
-        if (Math.abs(playerCurve - trackCurve) >= 0.55) speed -= .01 * speed;
+        if (Math.abs(playerCurve - trackCurve) >= 0.55 && speed>50 ) speed -= (speed > 130) ? .5 : 2;
 
         //set speed limits
         if (speed < 0) speed = 0;

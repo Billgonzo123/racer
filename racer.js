@@ -256,7 +256,8 @@ function loop() {
         }
         //find the target track curve for CPU after fi
         let CPUtargetCurve = trackArray[CPUtrackSection - 1][0];
-        if (CPUspeed > 245 && Math.abs(CPUtargetCurve) <= 1) CPUspeed -= Math.abs(Math.abs(CPUtargetCurve)*5);//slow CPU down on curvs
+        const targetSpeed = (speed>255) ? speed-5 : 245; //target speed for normal turn
+        if (CPUspeed > targetSpeed && Math.abs(CPUtargetCurve) <= 1) CPUspeed -= Math.abs(Math.abs(CPUtargetCurve)*5);//slow CPU down on curvs
         if (CPUspeed > 78 && Math.abs(CPUtargetCurve) > 1) CPUspeed -= 10 ;//slow CPU down on curvs
 
         //console.log('CPU Speed:', Math.round(CPUspeed) , CPUtargetCurve )
@@ -398,7 +399,7 @@ function loop() {
         //----------------------------------------------//
         //if you are outside the track, force slow down //
         //----------------------------------------------//
-        if (Math.abs(playerCurve - trackCurve) >= 0.55 && speed>50 ) speed -= (speed > 130) ? .5 : 2;
+        if (Math.abs(playerCurve - trackCurve) >= 0.55 && speed>50 ) speed -= (speed > 130) ? 1 : 2;
 
         //set speed limits
         if (speed < 0) speed = 0;

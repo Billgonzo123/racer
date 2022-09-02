@@ -22,7 +22,7 @@ This is a retro arcade style racer in the vein of Pol Position. Race against a C
 ## Engine Details
 The inspiration behind this project was to build something that worked like a retro game engine. To me, this means tile based or pixel rasterization; I chose the ladder.  Unfortunately, calculating each pixel individually has some serious performance drawbacks, especially in an interpreted language like JS. To overcome these performance limitations I did 3 things:
 
-- Extrapolated the pixel data into a one-dimensional array to prevent rendering to canvas more than once a frame
+- Extracted the pixel data as a one-dimensional array to prevent rendering to canvas more than once a frame
 - Utilized a web worker to calculate pixel data for half of the screen
 - Precalculated Math heavy pixel data
 

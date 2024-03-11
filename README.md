@@ -5,7 +5,7 @@
 
 ## Description  
 This is a retro arcade style racer in the vein of Pol Position. Race against a CPU player on 4 different tracks!
-## [Check out the current build!](https://chriskurz098.github.io/racer/)
+## [Check out the current build!]([https://chriskurz098.github.io/racer/](https://billgonzo123.github.io/racer/))
 
 ## Features
 - Day to Night cycle
@@ -30,13 +30,7 @@ The result is an engine that runs at least 10 times faster than it would without
 
 This game engine is based off  [OneLoneCoders](https://github.com/OneLoneCoder) command prompt game "Console Racer", which was originally written in C++. 
 
-## Contact
 
-Chris Kurz              [Github](https://github.com/chriskurz098)
-
-If you have any questions, contact Chris Kurz at:
-
-[ckurz098@gmail.com](mailto:ckurz098@gmail.com)
 
 ## License
   ![](https://img.shields.io/badge/license-MIT-blue)

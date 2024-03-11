@@ -5,7 +5,7 @@
 
 ## Description  
 This is a retro arcade style racer in the vein of Pol Position. Race against a CPU player on 4 different tracks!
-## [Check out the current build!]([https://chriskurz098.github.io/racer/](https://billgonzo123.github.io/racer/))
+## [Check out the current build!](https://billgonzo123.github.io/racer/)
 
 ## Features
 - Day to Night cycle
